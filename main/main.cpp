@@ -1,14 +1,11 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+
 using namespace std;
 
 const int passwd = 123;
 
-void addTreatment(Treatment t1);
-void viewTreatment(ifstream &treatmentFile);
-void updatePayment(ifstream &in, ofstream &out);
-void generateBill(ifstream &in);
 struct Patient {
     int patientId;         // Patient ID
     string name;           // Patient name
@@ -35,6 +32,13 @@ struct Treatment {
     double cost;        // Cost of treatment
     bool paid;          // True if bill is paid
 };
+
+void addTreatment(Treatment t1);
+void viewTreatment(ifstream &treatmentFile);
+void updatePayment(ifstream &in, ofstream &out);
+void generateBill(ifstream &in);
+
+
 
 int main() {
     char option = 'y';
@@ -103,14 +107,18 @@ int main() {
                 cout<<endl<<"Exiting. The system"<<endl;
                 return 2;
             default:
-                // cout<<endl<<"Invalid Option."<<endl;
+                cout<<endl<<"Invalid Option."<<endl;
         
         }
+        cout<<"Do you want to Continue(y/n)? ";
+        cin>>option;
     }
+
+    return 0;
 }
 
 void addTreatment(Treatment t1) {
-    cout<<endl<<"==========Add Treatment Records for Patien=========="<<endl;
+    cout<<endl<<"==========Add Treatment Records for Patient=========="<<endl;
     cout<<"Enter Patient Id to enter record: ";
     cin>>t1.patientId;
     cout<<"Enter Treatment details: ";
@@ -119,4 +127,16 @@ void addTreatment(Treatment t1) {
     cin>>t1.cost;
     cout<<"Is the bill paid(1 for yes, 0 for no)? ";
     cin>>t1.paid;
+}
+
+void viewTreatment(ifstream &treatmentFile) {
+
+}
+
+void updatePayment(ifstream &in, ofstream &out) {
+
+}
+
+void generateBill(ifstream &in) {
+
 }
