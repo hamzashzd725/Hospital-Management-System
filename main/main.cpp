@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <string>
+#include <cstring>
 
 using namespace std;
 
@@ -37,19 +37,31 @@ void addTreatment(Treatment t1);
 void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in, ofstream &out);
 void generateBill(ifstream &in);
-
+void searchDoctorBySpecialty();
 void searchPatientBydoc_ID();
+void viewTreatmentsByDoctor();
+void sortDoctorsByExperience();
 
 int main() {
     char option = 'y';
     int id, password;
 
     Treatment t1;
+    Patient p1;
+    Doctor d1;
+
     ofstream treatmentOut("treatments.txt", ios::app);
     ifstream treatmentIn("treatments.txt");
+    
     ofstream billOut("bills.txt", ios::app);
     ifstream billIn("bills.txt");
+
+    ifstream patientIn("patients.txt");
+    ofstream patienOut("patient.txt", ios::app);
     
+    ifstream doctorIn("doctors.txt");
+    ofstream doctorOut("doctors.txt", ios::app);
+
     cout<<"Enter User ID: "<<endl;
     cin>>id;
     cout<<"==========Welcome User "<<id<<"==========\nEnter Password: ";
@@ -103,8 +115,6 @@ int main() {
                 }
             break;
             case 5:
-                int opt;
-
                 cout<<endl<<"==========Search And Reports=========="<<endl;
                 cout<<endl<<"1. Search Patient"<<endl;
                 cout<<endl<<"2. Search Doctor"<<endl;
@@ -115,22 +125,116 @@ int main() {
                 cin>>opt;
                 switch(opt) {
                     case 1:
+                        int o;
                         cout<<endl<<"==========Search Patient=========="<<endl;
                         cout<<endl<<"1. Search by Patient ID "<<endl;
                         cout<<endl<<"2. Search by Patient Name"<<endl;
-                        
+                        cout<<endl<<"Enter Your Choice: ";
+                        cin>>o;
+
+                        if (o ==  1) {
+                                cout<<endl<<"==========Enter Patient ID=========="<<endl;
+                                int id;
+                                bool found = false;
+                                cout<<endl<<"Enter Patient ID: ";
+                                cin>>id;
+                                while(patientIn>>p1.patientId>>p1.name>>p1.age>>p1.gender>>p1.contact) {
+                                    if (p1.patientId == id) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found == true) {
+                                    cout<<endl<<"Patient Found!!"<<endl;
+                                    cout<<"Patient Details: "<<endl;
+                                    cout<<"Patient ID: "<<p1.patientId<<endl;
+                                    cout<<"Patient Name: "<<p1.name<<endl;
+                                    cout<<"Patient Age: "<<p1.age<<endl;
+                                    cout<<"Patient Gender: "<<p1.gender<<endl;
+                                    cout<<"Patient Contact: "<<p1.contact<<endl;
+                                }
+                                else if (found == false) {
+                                    cout<<endl<<"Patient Not Found"<<endl;
+                                }
+                        }
+                        else if(o == 2) { 
+                                cout<<endl<<"==========Enter Patient Name=========="<<endl;
+                                string name;
+                                bool found = false;
+                                cout<<endl<<"Enter Patient ID: ";
+                                getline(cin, name);
+                                while(patientIn>>p1.patientId>>p1.name>>p1.age>>p1.gender>>p1.contact) {
+                                    if (p1.name == name) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found == true) {
+                                    cout<<endl<<"Patient Found!!"<<endl;
+                                    cout<<"Patient Details: "<<endl;
+                                    cout<<"Patient ID: "<<p1.patientId<<endl;
+                                    cout<<"Patient Name: "<<p1.name<<endl;
+                                    cout<<"Patient Age: "<<p1.age<<endl;
+                                    cout<<"Patient Gender: "<<p1.gender<<endl;
+                                    cout<<"Patient Contact: "<<p1.contact<<endl;
+                                }
+                                else if (found == false) {
+                                    cout<<endl<<"Patient Not Found"<<endl;
+                                }
+                        }
+                        else {
+                                cout<<endl<<"Invalid Option"<<endl;
+                        } 
                         break;
                     case 2:
-                        cout<<endl<<"==========View Treatments=========="<<endl;
-                        viewTreatment(treatmentIn);
+                        int sel;
+                        cout<<endl<<"==========Search Doctors=========="<<endl;
+                        cout<<endl<<"1. Search Doctor By Doc ID"<<endl;
+                        cout<<endl<<"2. Search Doctor By Speciality"<<endl;
+                        cout<<endl<<"Enter Option: ";
+                        cin>>sel;
+                        if (0 ==  1) {
+                                cout<<endl<<"==========Enter Doctor ID=========="<<endl;
+                                int id;
+                                bool found = false;
+                                cout<<endl<<"Enter Doctor ID: ";
+                                cin>>id;
+                                while(doctorIn>>d1.doc_id>>d1.name>>d1.specialty>>d1.experience) {
+                                    if (d1.doc_id == id) {
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                                if (found == true) {
+                                    cout<<endl<<"Doctor Found!!"<<endl;
+                                    cout<<"Doctor Details: "<<endl;
+                                    cout<<"Doctor ID: "<<d1.doc_id<<endl;
+                                    cout<<"Doctor Name: "<<d1.name<<endl;
+                                    cout<<"Doctor Speciality: "<<d1.specialty<<endl;
+                                    cout<<"Doctor Experience: "<<d1.experience<<endl;
+                                }
+                                else if (found == false) {
+                                    cout<<endl<<"Doctor Not Found"<<endl;
+                                }
+                        }
+                        else if (o == 2) {
+                            searchDoctorBySpecialty();
+                        }
+                        else {
+                            cout<<endl<<"Invalid Option"<<endl;
+                        }
                         break;
                     case 3:
-                        cout<<endl<<"==========Update Payment Status=========="<<endl;
-                        updatePayment(billIn, billOut);
+                        cout<<endl<<"==========Search Treatment By Doc ID=========="<<endl;
+                        void viewTreatmentsByDoctor();
                         break;
                     case 4:
                         cout<<endl<<"==========Generate Bill=========="<<endl;
                         generateBill(billIn);
+                        break;
+                    case 5:
+                        cout<<endl<<"==========Sort Doctors By Experience=========="<<endl;
+                        sortDoctorsByExperience();
                         break;
                     default:
                         cout<<endl<<"Invalid option"<<endl;
@@ -175,5 +279,16 @@ void generateBill(ifstream &in) {
 }
 
 void searchPatientBydoc_ID() {
+
+}
+
+void searchDoctorBySpecialty() {
+
+}
+
+void viewTreatmentsByDoctor() {
+
+}
+void sortDoctorsByExperience() {
 
 }
