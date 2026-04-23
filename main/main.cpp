@@ -38,7 +38,7 @@ void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in, ofstream &out);
 void generateBill(ifstream &in);
 
-
+void searchPatientBydoc_ID();
 
 int main() {
     char option = 'y';
@@ -52,7 +52,7 @@ int main() {
     
     cout<<"Enter User ID: "<<endl;
     cin>>id;
-    cout<<"Welcome User: "<<id<<".\nEnter Password: ";
+    cout<<"==========Welcome User "<<id<<"==========\nEnter Password: ";
     cin>>password;
 
     if (password != passwd) {
@@ -69,7 +69,7 @@ int main() {
         cout<<"4. Treatments and Billings"<<endl;
         cout<<"5. Search / Reports"<<endl;
         cout<<"6. Exit"<<endl;
-        cout<<endl<<"Enter your option: "<<endl;
+        cout<<endl<<"Enter your option: ";
         cin>>select;
 
         switch(select) {
@@ -80,7 +80,7 @@ int main() {
                 cout<<"2. View Treatments"<<endl;
                 cout<<"3. Update Payment Status"<<endl;
                 cout<<"4. Generate Bill"<<endl;
-                cout<<endl<<"Enter Option: "<<endl;
+                cout<<endl<<"Enter Option: ";
                 cin>>opt;
                 switch(opt) {
                     case 1:
@@ -102,7 +102,40 @@ int main() {
                         cout<<endl<<"Invalid option"<<endl;
                 }
             break;
+            case 5:
+                int opt;
 
+                cout<<endl<<"==========Search And Reports=========="<<endl;
+                cout<<endl<<"1. Search Patient"<<endl;
+                cout<<endl<<"2. Search Doctor"<<endl;
+                cout<<endl<<"3. Search Treatments provided by a doctor"<<endl;
+                cout<<endl<<"4. Generate Bills/Report"<<endl;
+                cout<<endl<<"5. Sort all doctors by years of experience"<<endl;
+                cout<<endl<<"Enter Option: ";
+                cin>>opt;
+                switch(opt) {
+                    case 1:
+                        cout<<endl<<"==========Search Patient=========="<<endl;
+                        cout<<endl<<"1. Search by Patient ID "<<endl;
+                        cout<<endl<<"2. Search by Patient Name"<<endl;
+                        
+                        break;
+                    case 2:
+                        cout<<endl<<"==========View Treatments=========="<<endl;
+                        viewTreatment(treatmentIn);
+                        break;
+                    case 3:
+                        cout<<endl<<"==========Update Payment Status=========="<<endl;
+                        updatePayment(billIn, billOut);
+                        break;
+                    case 4:
+                        cout<<endl<<"==========Generate Bill=========="<<endl;
+                        generateBill(billIn);
+                        break;
+                    default:
+                        cout<<endl<<"Invalid option"<<endl;
+                }
+            break;
             case 6:
                 cout<<endl<<"Exiting. The system"<<endl;
                 return 2;
@@ -138,5 +171,9 @@ void updatePayment(ifstream &in, ofstream &out) {
 }
 
 void generateBill(ifstream &in) {
+
+}
+
+void searchPatientBydoc_ID() {
 
 }
