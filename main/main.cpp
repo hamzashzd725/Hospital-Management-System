@@ -33,6 +33,16 @@ struct Treatment {
     bool paid;          // True if bill is paid
 };
 
+void scheduleAppointment();
+void cancelAppointment();
+void addPatient();
+void addDoctor();
+void updatePatient();
+void updateDoctor();
+void deletePatient();
+void deleteDoctor();
+void viewPatients();
+void viewDoctors();
 void addTreatment(Treatment t1);
 void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in, ofstream &out);
@@ -41,6 +51,8 @@ void searchDoctorBySpecialty();
 void searchPatientBydoc_ID();
 void viewTreatmentsByDoctor();
 void sortDoctorsByExperience();
+void viewAppointments();
+
 
 int main() {
     char option = 'y';
@@ -85,6 +97,95 @@ int main() {
         cin>>select;
 
         switch(select) {
+             case 1:
+
+		 cout<<endl<< "==========Patient Management=========="<<endl;
+         cout<<"1. Add Patient"<<endl;
+         cout<<"2. Update Patient"<<endl;
+         cout << "3. Delete Patient"<<endl;
+         cout << "4. View Patients"<<endl;
+         int choicep;
+         cin >> choicep;
+        if (choicep==1) {
+            addPatient();
+        }
+        
+        else if (choicep==2) {
+        updatePatient(); 
+        }
+        
+        else if (choicep==3) {
+        deletePatient();
+        }
+        
+        else if (choicep==4) {
+        viewPatients();
+        }
+        else {
+        cout << "Invalid choice";
+        }
+        break;
+            
+        case 2:
+            cout<<endl<< "==========Doctor Management=========="<<endl;
+            cout << "1. Add Doctor"<<endl;
+            cout << "2. Update Doctor"<<endl;
+            cout << "3. Delete Doctor"<<endl;
+            cout << "4. View All Doctors"<<endl;
+            int choiced;
+            cin>>choiced;
+            if(choiced== 1) {
+                addDoctor();
+            }
+            
+            else if(choiced== 2) {
+                updateDoctor();
+            }
+            
+            else if(choiced== 3) {
+                deleteDoctor();
+            }
+            
+            else if(choiced== 4) {
+                viewDoctors();
+            }
+            
+            else {
+                cout<<"Invalid choice"<<endl;
+            }
+            break;
+            
+        case 3:
+            cout<<endl<< "==========Appointments=========="<<endl;
+            cout<< "1. View Appointments"<<endl;
+            cout<< "2. Schedule Appointments"<<endl;
+            cout<< "3. Cancel Appointments"<<endl;
+            
+            int choicea;
+            cin>>choicea;
+            
+            if(choicea== 1)
+            {
+            viewAppointments();
+            }
+        
+            else if(choicea== 2)
+            {
+                scheduleAppointment(); 
+            }
+        
+            else if(choicea== 3)
+            {
+                cancelAppointment();
+            }
+            else
+            {
+                cout<<"Invalid choice"<<endl;
+                return 0;
+            }
+            
+            break;
+ 
             case 4:
                 int opt;
                 cout<<endl<<"==========Treatment And Billing Management=========="<<endl;
@@ -290,5 +391,38 @@ void viewTreatmentsByDoctor() {
 
 }
 void sortDoctorsByExperience() {
+
+}
+void scheduleAppointment() {
+
+}
+void cancelAppointment() {
+
+}
+void addPatient() {
+
+}
+void addDoctor() {
+
+}
+void updatePatient() {
+
+}
+void updateDoctor() {
+
+}
+void deletePatient() {
+
+}
+void deleteDoctor() {
+
+}
+void viewPatients() {
+
+}
+void viewDoctors() {
+
+}
+void viewAppointments() {
 
 }
