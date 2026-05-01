@@ -389,7 +389,37 @@ void viewTreatment(ifstream &treatmentFile) {
 }
 
 void updatePayment(ifstream &in) {
-
+    int patientId, cost;
+    string paid;
+    ofstream out("temp.txt");
+    cout<<"Enter patient id to update payment status: ";
+    int tempId;
+    cin>>tempId;
+    while(in>>patientId) {
+        in.ignore();
+        in>>cost;
+        in.ignore();
+        getline(in, paid, '\n');
+        string temp = "";
+        for(int i = 0; i < paid.length(); i++) {
+            if(paid[i] != '\r')
+                temp += paid[i];
+        }
+        paid = temp;
+        if (tempId == patientId) {
+            if (paid == "Paid") {
+                paid = "Unpaid";
+            }
+            else if(paid == "Unpaid") {
+                paid = "Paid";
+            }
+        }
+        out<<patientId<<"#"<<cost<<"#"<<paid<<endl;
+    }
+    cout<<"Bills.txt Update"<<endl;
+    out.close();
+    remove("bills.txt");
+    rename("temp.txt", "bills.txt");
 }
 
 void generateBill(ifstream &in) {
@@ -661,7 +691,7 @@ void viewDoctors(ifstream &inFile) {
     delete d1;
 }
 void viewAppointments() {
-
+    
 }
 void cleanFile() {
     ifstream patientFile("patients.txt"); 
