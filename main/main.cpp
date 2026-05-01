@@ -51,7 +51,7 @@ void generateBill(ifstream &in);
 void searchDoctorBySpecialty(ifstream &infile);
 void searchPatientBydoc_ID();
 void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile);
-void sortDoctorsByExperience();
+void sortDoctorsByExperience(ifstream &inFile);
 void viewAppointments();
 void cleanFile();
 void removeDuplicatePatients();
@@ -138,6 +138,7 @@ int main() {
                 cout << "2. Update Doctor"<<endl;
                 cout << "3. Delete Doctor"<<endl;
                 cout << "4. View All Doctors"<<endl;
+                cout << "5. Sort Doctors By Experience"<<endl;
                 int choiced;
                 cout<<"Enter Option: ";
                 cin>>choiced;
@@ -157,7 +158,9 @@ int main() {
                 else if(choiced== 4) {
                     viewDoctors(doctorIn);
                 }
-                
+                else if(choiced == 5) {
+                    sortDoctorsByExperience(doctorIn);
+                }
                 else {
                     cout<<"Invalid choice"<<endl;
                 }
@@ -224,19 +227,19 @@ int main() {
                 break;
             case 5:
                 cout<<endl<<"==========Search And Reports=========="<<endl;
-                cout<<endl<<"1. Search Patient"<<endl;
-                cout<<endl<<"2. Search Doctor"<<endl;
-                cout<<endl<<"3. Search Treatments provided by a doctor"<<endl;
-                cout<<endl<<"4. Generate Bills/Report"<<endl;
-                cout<<endl<<"5. Sort all doctors by years of experience"<<endl;
-                cout<<endl<<"Enter Option: ";
+                cout<<"1. Search Patient"<<endl;
+                cout<<"2. Search Doctor"<<endl;
+                cout<<"3. Search Treatments provided by a doctor"<<endl;
+                cout<<"4. Generate Bills/Report"<<endl;
+                cout<<"5. Sort all doctors by years of experience"<<endl;
+                cout<<"Enter Option: ";
                 cin>>opt;
                 switch(opt) {
                     case 1:
                         int o;
                         cout<<endl<<"==========Search Patient=========="<<endl;
-                        cout<<endl<<"1. Search by Patient ID "<<endl;
-                        cout<<endl<<"2. Search by Patient Name"<<endl;
+                        cout<<endl<<"1. Search by Patient ID ";
+                        cout<<endl<<"2. Search by Patient Name";
                         cout<<endl<<"Enter Your Choice: ";
                         cin>>o;
                         cin.ignore();
@@ -315,8 +318,8 @@ int main() {
                     case 2:
                         int sel;
                         cout<<endl<<"==========Search Doctors=========="<<endl;
-                        cout<<endl<<"1. Search Doctor By Doc ID"<<endl;
-                        cout<<endl<<"2. Search Doctor By Speciality"<<endl;
+                        cout<<endl<<"1. Search Doctor By Doc ID";
+                        cout<<endl<<"2. Search Doctor By Speciality";
                         cout<<endl<<"Enter Option: ";
                         cin>>sel;
                         cin.ignore();
@@ -367,7 +370,7 @@ int main() {
                         break;
                     case 5:
                         cout<<endl<<"==========Sort Doctors By Experience=========="<<endl;
-                        sortDoctorsByExperience();
+                        sortDoctorsByExperience(doctorIn);
                         break;
                     default:
                         cout<<endl<<"Invalid option"<<endl;
@@ -515,8 +518,46 @@ void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile) 
     }
 
 }
-void sortDoctorsByExperience() {
-
+void sortDoctorsByExperience(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+    int count = 0;
+    string line;
+    while(getline(inFile, line)) {
+        count++;
+    }
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+    Doctor *doctors = new Doctor[count];
+    int i = 0;
+    while(inFile>>doctors[i].doc_id) {
+        inFile.ignore();
+        getline(inFile, doctors[i].name, '#');
+        getline(inFile, doctors[i].specialty, '#');
+        inFile>>doctors[i].experience;
+        inFile.ignore();
+        i++;
+    }
+    for(int i = 0; i < count - 1; i++) {
+        for(int j = 0; j < count - i - 1; j++) {
+            if(doctors[j].experience > doctors[j+1].experience) {
+                Doctor temp = doctors[j];
+                doctors[j] = doctors[j+1];
+                doctors[j+1] = temp;
+            }
+        }
+    }
+    ofstream out("temp.txt");
+    for(int i = 0; i < count; i++) {
+        out<<doctors[i].doc_id<<"#"<<doctors[i].name<<"#"
+           <<doctors[i].specialty<<"#"<<doctors[i].experience<<endl;
+    }
+    out.close();
+    remove("doctors.txt");
+    rename("temp.txt", "doctors.txt");
+    delete[] doctors;
+    cout<<"Doctors sorted by experience."<<endl;
+    viewDoctors(inFile);
 }
 void scheduleAppointment() {
 
