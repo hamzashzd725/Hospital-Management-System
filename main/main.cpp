@@ -38,8 +38,8 @@ void scheduleAppointment();
 void cancelAppointment();
 void addPatient();
 void addDoctor();
-void updatePatient(ofstream &outFile, ifstream &inFile);
-void updateDoctor(ofstream &outfile, ifstream &inFile);
+void updatePatient(ifstream &inFile);
+void updateDoctor(ifstream &inFile);
 void deletePatient();
 void deleteDoctor();
 void viewPatients(ifstream &inFile);
@@ -55,6 +55,11 @@ void sortDoctorsByExperience();
 void viewAppointments();
 void cleanFile();
 void removeDuplicatePatients();
+void cleanDoctor(ifstream &inFile);
+void cleanPatient(ifstream &inFile);
+void cleanAppoitment(ifstream &inFile);
+void cleanTreatment(ifstream &inFile);
+bool isValidRecord(int count, string line);
 
 int main() {
     char option = 'y';
@@ -63,7 +68,7 @@ int main() {
     Treatment t1;
     Patient p1;
     Doctor d1;
-
+    cleanFile();
     ofstream treatmentOut("treatments.txt", ios::app);
     ifstream treatmentIn("treatments.txt");
     
@@ -113,7 +118,7 @@ int main() {
                 }
             
                 else if (choicep==2) {
-                    updatePatient(patientOut, patientIn); 
+                    updatePatient(patientIn); 
                 }
             
                 else if (choicep==3) {
@@ -142,7 +147,7 @@ int main() {
                 }
                 
                 else if(choiced== 2) {
-                    updateDoctor(doctorOut, doctorIn);
+                    updateDoctor(doctorIn);
                 }
                 
                 else if(choiced== 3) {
@@ -407,25 +412,24 @@ void addPatient() {
 void addDoctor() {
 
 }
-void updatePatient(ofstream &outFile, ifstream &inFile) {
-    Patient p1;
-    int idCheck, ageTemp;
-    string nameTemp, contactTemp, genderTemp;
+void updatePatient(ifstream &inFile) {
+    Patient *p1 = new Patient;
+    int idCheck;
     ofstream tempFile("tempFile.txt");
     bool isfound = false; 
     double balanceTemp;
     cout<<"Enter Patients ID whose data you want to update: ";
     cin>>idCheck;
-    while(inFile>>p1.patientId) {
+    while(inFile>>p1->patientId) {
         inFile.ignore();
-        getline(inFile ,p1.name, '#');
-        inFile>>p1.age;
+        getline(inFile ,p1->name, '#');
+        inFile>>p1->age;
         inFile.ignore();
-        getline(inFile, p1.gender, '#');
-        getline(inFile, p1.contact, '#');
-        inFile>>p1.balance;
+        getline(inFile, p1->gender, '#');
+        getline(inFile, p1->contact, '#');
+        inFile>>p1->balance;
         inFile.ignore();
-        if (idCheck == p1.patientId) {
+        if (idCheck == p1->patientId) {
             cout<<endl<<"ID Found"<<endl;
             
             isfound = true;
@@ -442,43 +446,37 @@ void updatePatient(ofstream &outFile, ifstream &inFile) {
             switch(option) {
                 case 1:
                     cout<<"Enter Name of Patient: ";
-                    getline(cin,nameTemp);
-                    cout<<"Name Updated to "<<nameTemp<<endl;
-                    p1.name = nameTemp;
+                    getline(cin, p1->name);
+                    cout<<"Name Updated to "<<p1->name<<endl;
                     break;
                 case 2:
                     cout<<"Enter age: ";
-                    cin>>ageTemp;
+                    cin>>p1->age;
                     cin.ignore();
-                    cout<<"New age is "<<ageTemp<<endl;
-                    p1.age = ageTemp;
+                    cout<<"New age is "<<p1->age<<endl;
                     break;
                 case 3:
                     cout<<"Enter Contact(11 digits): ";
-                    getline(cin, contactTemp);
-                    cout<<"New Contact is "<<contactTemp<<endl;
-                    p1.contact = contactTemp;
+                    getline(cin, p1->contact);
+                    cout<<"New Contact is "<<p1->contact<<endl;
                     break;
                 case 4:
                     cout<<"Enter Balance: ";
-                    cin>>balanceTemp;
+                    cin>>p1->balance;
                     cin.ignore();
-                    cout<<"New balance is "<<balanceTemp<<endl;
-                    p1.balance = balanceTemp;
+                    cout<<"New balance is "<<p1->balance<<endl;
                     break;
                 case 5:
                     cout<<"Enter gender: ";
-                    getline(cin, genderTemp);
-                    cout<<"New gender is "<<genderTemp<<endl;
-                    p1.gender = genderTemp;
+                    getline(cin, p1->gender);
+                    cout<<"New gender is "<<p1->gender<<endl;
                     break;
                 default:
                     cout<<"Invalid Option"<<endl;
                     break;
             }
         }
-        tempFile<<p1.patientId<<"#"<<p1.name<<"#"<<p1.age<<"#"<<p1.gender<<"#"<<p1.contact<<"#"<<p1.balance<<endl;
-        
+        tempFile<<p1->patientId<<"#"<<p1->name<<"#"<<p1->age<<"#"<<p1->gender<<"#"<<p1->contact<<"#"<<p1->balance<<endl;
     }
     if (isfound == false) {
         cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
@@ -489,21 +487,22 @@ void updatePatient(ofstream &outFile, ifstream &inFile) {
     removeDuplicatePatients();
     tempFile.close();
     cout<<"File Updated"<<endl;
+    delete p1;
 }
-void updateDoctor(ofstream &outFile, ifstream &inFile) {
-    Doctor d1;
+void updateDoctor(ifstream &inFile) {
+    Doctor *d1 = new Doctor;
     int idCheck;
     ofstream tempFile("temp.txt");
     bool isfound = false; 
     cout<<"Enter Doctors ID whose data you want to update: ";
     cin>>idCheck;
-    while(inFile>>d1.doc_id) {
+    while(inFile>>d1->doc_id) {
         inFile.ignore();
-        getline(inFile ,d1.name, '#');
-        getline(inFile, d1.specialty, '#');
-        inFile>>d1.experience;
+        getline(inFile ,d1->name, '#');
+        getline(inFile, d1->specialty, '#');
+        inFile>>d1->experience;
         inFile.ignore();
-        if (idCheck == d1.doc_id) {
+        if (idCheck == d1->doc_id) {
             cout<<endl<<"ID Found"<<endl;
             isfound = true;
 
@@ -518,26 +517,26 @@ void updateDoctor(ofstream &outFile, ifstream &inFile) {
             switch(option) {
                 case 1:
                     cout<<"Enter Name of Doctor: ";
-                    getline(cin,d1.name);
-                    cout<<"Name Updated to "<<d1.name<<endl;
+                    getline(cin,d1->name);
+                    cout<<"Name Updated to "<<d1->name<<endl;
                     break;
                 case 2:
                     cout<<"Enter Speciality: ";
-                    getline(cin, d1.specialty);
-                    cout<<"New Speciality is "<<d1.specialty<<endl;
+                    getline(cin, d1->specialty);
+                    cout<<"New Speciality is "<<d1->specialty<<endl;
                     break;
                 case 3:
                     cout<<"Enter experience: ";
-                    cin>>d1.experience;
+                    cin>>d1->experience;
                     cin.ignore();
-                    cout<<"New Experience is "<<d1.experience<<endl;
+                    cout<<"New Experience is "<<d1->experience<<endl;
                     break;
                 default:
                     cout<<"Invalid Option"<<endl;
                     break;
             }
         }
-        tempFile<<d1.doc_id<<"#"<<d1.name<<"#"<<d1.specialty<<"#"<<d1.experience<<endl;
+        tempFile<<d1->doc_id<<"#"<<d1->name<<"#"<<d1->specialty<<"#"<<d1->experience<<endl;
     }
     if (isfound == false) {
         cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
@@ -547,7 +546,7 @@ void updateDoctor(ofstream &outFile, ifstream &inFile) {
     rename("temp.txt", "doctors.txt");
     tempFile.close();
     cout<<"File Updated"<<endl;
-
+    delete d1;
 }
 void deletePatient() {
 
@@ -556,41 +555,122 @@ void deleteDoctor() {
 
 }
 void viewPatients(ifstream &inFile) {
-    Patient p1;
+    Patient *p1 = new Patient;
     cout<<endl<<"==========View Patients=========="<<endl;
     cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Age"<<setw(20)<<"Gender"<<setw(20)<<"Contact"<<setw(20)<<"Ballance"<<endl;
-    while(inFile>>p1.patientId) {
+    while(inFile>>p1->patientId) {
         inFile.ignore();
-        getline(inFile ,p1.name, '#');
-        inFile>>p1.age;
+        getline(inFile ,p1->name, '#');
+        inFile>>p1->age;
         inFile.ignore();
-        getline(inFile, p1.gender, '#');
-        getline(inFile, p1.contact, '#');
-        inFile>>p1.balance;
+        getline(inFile, p1->gender, '#');
+        getline(inFile, p1->contact, '#');
+        inFile>>p1->balance;
         inFile.ignore();
-        cout<<left<<setw(20)<<p1.patientId<<setw(20)<<p1.name<<setw(20)<<p1.age<<setw(20)<<p1.gender<<setw(20)<<p1.contact<<setw(20)<<p1.balance<<endl;    
+        cout<<left<<setw(20)<<p1->patientId<<setw(20)<<p1->name<<setw(20)<<p1->age<<setw(20)<<p1->gender<<setw(20)<<p1->contact<<setw(20)<<p1->balance<<endl;    
     }
+    delete p1;
 }
 void viewDoctors(ifstream &inFile) {
-    Doctor d1;
+    Doctor *d1 = new Doctor;
     cout<<endl<<"==========View Doctors=========="<<endl;
     cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Speciality"<<setw(20)<<"Experience"<<endl;
-    while(inFile>>d1.doc_id) {
+    while(inFile>>d1->doc_id) {
         inFile.ignore();
-        getline(inFile ,d1.name, '#');
-        getline(inFile, d1.specialty, '#');
-        inFile>>d1.experience;
+        getline(inFile ,d1->name, '#');
+        getline(inFile, d1->specialty, '#');
+        inFile>>d1->experience;
         inFile.ignore();
-        cout<<left<<setw(20)<<d1.doc_id<<setw(20)<<d1.name<<setw(20)<<d1.specialty<<setw(20)<<d1.experience<<endl;
+        cout<<left<<setw(20)<<d1->doc_id<<setw(20)<<d1->name<<setw(20)<<d1->specialty<<setw(20)<<d1->experience<<endl;
     }
-
+    delete d1;
 }
 void viewAppointments() {
 
 }
 void cleanFile() {
-
+    ifstream patientFile("patients.txt"); 
+    cleanPatient(patientFile);
+    patientFile.close();
 }
 void removeDuplicatePatients() {
 
+}
+
+void cleanDoctor(ifstream &inFile) {
+
+}
+void cleanPatient(ifstream &inFile) {
+    Patient *p1 = new Patient;
+    ofstream outFile("temp.txt");
+    string line;
+    while(true) {
+        long pos = inFile.tellg();
+        if(!getline(inFile, line)) { 
+            break;
+        }
+        bool valid = isValidRecord(5, line);
+        if (valid == true) {
+            inFile.seekg(pos);
+            inFile>>p1->patientId;
+            inFile.ignore();
+            getline(inFile, p1->name, '#');
+            inFile>>p1->age;
+            bool ageFlag = true;
+            if(p1->age < 10) {
+                ageFlag = false;
+            }
+            inFile.ignore();
+            getline(inFile, p1->gender, '#');
+            if (p1->gender == "M") {
+                p1->gender = "Male";
+            }
+            else if (p1->gender == "F") {
+                p1->gender = "Female";
+            }
+            getline(inFile, p1->contact, '#');
+            inFile>>p1->balance;
+            inFile.ignore();
+            int length = (p1->contact).length();
+            bool flag = true; 
+            if (length != 11) {
+                continue;
+            }
+            for(int i = 0; i < length; i++) {
+                if(p1->contact[i] < '0' || p1->contact[i] > '9') {
+                    flag = false;
+                }
+            }
+            if (flag == false) {
+                continue;
+            }
+            if(ageFlag == false) {
+                continue;
+            }
+            outFile<<p1->patientId<<"#"<<p1->name<<"#"<<p1->age<<"#"<<p1->gender<<"#"<<p1->contact<<"#"<<p1->balance<<endl;
+        }
+    }
+    remove("patients.txt");
+    rename("temp.txt", "patients.txt");
+    outFile.close();
+    delete p1;
+}
+void cleanAppoitment(ifstream &inFile) {
+
+}
+void cleanTreatment(ifstream &inFile) {
+
+}
+bool isValidRecord(int count, string line) {
+    int hash = 0;
+    for (int i = 0; i < line.length(); i++) {
+        if (line[i] == '#')
+            hash++;
+    }
+    if (hash == count) {
+        return true;
+    }
+    else {
+        return false;
+    }
 }
