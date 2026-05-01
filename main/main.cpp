@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <iomanip>
 
 using namespace std;
 
@@ -41,8 +42,8 @@ void updatePatient(ofstream &outFile, ifstream &inFile);
 void updateDoctor(ofstream &outfile, ifstream &inFile);
 void deletePatient();
 void deleteDoctor();
-void viewPatients();
-void viewDoctors();
+void viewPatients(ifstream &inFile);
+void viewDoctors(ifstream &inFile);
 void addTreatment(Treatment t1);
 void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in, ofstream &out);
@@ -75,7 +76,7 @@ int main() {
     ifstream doctorIn("doctors.txt");
     ofstream doctorOut("doctors.txt", ios::app);
 
-    cout<<"Enter User ID: "<<endl;
+    cout<<"Enter User ID: ";
     cin>>id;
     cout<<"==========Welcome User "<<id<<"==========\nEnter Password: ";
     cin>>password;
@@ -120,7 +121,7 @@ int main() {
                 }
                 
                 else if (choicep==4) {
-                    viewPatients();
+                    viewPatients(patientIn);
                 }
                 else {
                     cout << "Invalid choice";
@@ -149,7 +150,7 @@ int main() {
                 }
                 
                 else if(choiced== 4) {
-                    viewDoctors();
+                    viewDoctors(doctorIn);
                 }
                 
                 else {
@@ -546,10 +547,34 @@ void deletePatient() {
 void deleteDoctor() {
 
 }
-void viewPatients() {
-
+void viewPatients(ifstream &inFile) {
+    Patient p1;
+    cout<<endl<<"==========View Patients=========="<<endl;
+    cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Age"<<setw(20)<<"Gender"<<setw(20)<<"Contact"<<setw(20)<<"Ballance"<<endl;
+    while(inFile>>p1.patientId) {
+        inFile.ignore();
+        getline(inFile ,p1.name, '#');
+        inFile>>p1.age;
+        inFile.ignore();
+        getline(inFile, p1.gender, '#');
+        getline(inFile, p1.contact, '#');
+        inFile>>p1.balance;
+        inFile.ignore();
+        cout<<left<<setw(20)<<p1.patientId<<setw(20)<<p1.name<<setw(20)<<p1.age<<setw(20)<<p1.gender<<setw(20)<<p1.contact<<setw(20)<<p1.balance<<endl;    
+    }
 }
-void viewDoctors() {
+void viewDoctors(ifstream &inFile) {
+    Doctor d1;
+    cout<<endl<<"==========View Doctors=========="<<endl;
+    cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Speciality"<<setw(20)<<"Experience"<<endl;
+    while(inFile>>d1.doc_id) {
+        inFile.ignore();
+        getline(inFile ,d1.name, '#');
+        getline(inFile, d1.specialty, '#');
+        inFile>>d1.experience;
+        inFile.ignore();
+        cout<<left<<setw(20)<<d1.doc_id<<setw(20)<<d1.name<<setw(20)<<d1.specialty<<setw(20)<<d1.experience<<endl;
+    }
 
 }
 void viewAppointments() {
