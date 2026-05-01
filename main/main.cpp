@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <cstring>
+#include <string>
 
 using namespace std;
 
@@ -37,8 +37,8 @@ void scheduleAppointment();
 void cancelAppointment();
 void addPatient();
 void addDoctor();
-void updatePatient();
-void updateDoctor();
+void updatePatient(ofstream &outFile, ifstream &inFile);
+void updateDoctor(ofstream &outfile, ifstream &inFile);
 void deletePatient();
 void deleteDoctor();
 void viewPatients();
@@ -52,7 +52,8 @@ void searchPatientBydoc_ID();
 void viewTreatmentsByDoctor();
 void sortDoctorsByExperience();
 void viewAppointments();
-
+void cleanFile();
+void removeDuplicatePatients();
 
 int main() {
     char option = 'y';
@@ -69,7 +70,7 @@ int main() {
     ifstream billIn("bills.txt");
 
     ifstream patientIn("patients.txt");
-    ofstream patienOut("patient.txt", ios::app);
+    ofstream patientOut("patients.txt", ios::app);
     
     ifstream doctorIn("doctors.txt");
     ofstream doctorOut("doctors.txt", ios::app);
@@ -97,95 +98,95 @@ int main() {
         cin>>select;
 
         switch(select) {
-             case 1:
-
-		 cout<<endl<< "==========Patient Management=========="<<endl;
-         cout<<"1. Add Patient"<<endl;
-         cout<<"2. Update Patient"<<endl;
-         cout << "3. Delete Patient"<<endl;
-         cout << "4. View Patients"<<endl;
-         int choicep;
-         cin >> choicep;
-        if (choicep==1) {
-            addPatient();
-        }
-        
-        else if (choicep==2) {
-        updatePatient(); 
-        }
-        
-        else if (choicep==3) {
-        deletePatient();
-        }
-        
-        else if (choicep==4) {
-        viewPatients();
-        }
-        else {
-        cout << "Invalid choice";
-        }
-        break;
+            case 1:
+                cout<<endl<< "==========Patient Management=========="<<endl;
+                cout<<"1. Add Patient"<<endl;
+                cout<<"2. Update Patient"<<endl;
+                cout << "3. Delete Patient"<<endl;
+                cout << "4. View Patients"<<endl;
+                cout<<"Enter option: ";
+                int choicep;
+                cin >> choicep;
+                if (choicep==1) {
+                    addPatient();
+                }
             
-        case 2:
-            cout<<endl<< "==========Doctor Management=========="<<endl;
-            cout << "1. Add Doctor"<<endl;
-            cout << "2. Update Doctor"<<endl;
-            cout << "3. Delete Doctor"<<endl;
-            cout << "4. View All Doctors"<<endl;
-            int choiced;
-            cin>>choiced;
-            if(choiced== 1) {
-                addDoctor();
-            }
+                else if (choicep==2) {
+                    updatePatient(patientOut, patientIn); 
+                }
             
-            else if(choiced== 2) {
-                updateDoctor();
-            }
+                else if (choicep==3) {
+                    deletePatient();
+                }
+                
+                else if (choicep==4) {
+                    viewPatients();
+                }
+                else {
+                    cout << "Invalid choice";
+                }
+                break;
+                
+            case 2:
+                cout<<endl<< "==========Doctor Management=========="<<endl;
+                cout << "1. Add Doctor"<<endl;
+                cout << "2. Update Doctor"<<endl;
+                cout << "3. Delete Doctor"<<endl;
+                cout << "4. View All Doctors"<<endl;
+                int choiced;
+                cin>>choiced;
+                cout<<"Enter Option: ";
+                if(choiced== 1) {
+                    addDoctor();
+                }
+                
+                else if(choiced== 2) {
+                    updateDoctor(doctorOut, doctorIn);
+                }
+                
+                else if(choiced== 3) {
+                    deleteDoctor();
+                }
+                
+                else if(choiced== 4) {
+                    viewDoctors();
+                }
+                
+                else {
+                    cout<<"Invalid choice"<<endl;
+                }
+                break;
+                
+            case 3:
+                cout<<endl<< "==========Appointments=========="<<endl;
+                cout<< "1. View Appointments"<<endl;
+                cout<< "2. Schedule Appointments"<<endl;
+                cout<< "3. Cancel Appointments"<<endl;
+                cout<<"Enter Option: ";
+                int choicea;
+                cin>>choicea;
+                
+                if(choicea== 1)
+                {
+                    viewAppointments();
+                }
             
-            else if(choiced== 3) {
-                deleteDoctor();
-            }
+                else if(choicea== 2)
+                {
+                    scheduleAppointment(); 
+                }
             
-            else if(choiced== 4) {
-                viewDoctors();
-            }
-            
-            else {
-                cout<<"Invalid choice"<<endl;
-            }
-            break;
-            
-        case 3:
-            cout<<endl<< "==========Appointments=========="<<endl;
-            cout<< "1. View Appointments"<<endl;
-            cout<< "2. Schedule Appointments"<<endl;
-            cout<< "3. Cancel Appointments"<<endl;
-            
-            int choicea;
-            cin>>choicea;
-            
-            if(choicea== 1)
-            {
-            viewAppointments();
-            }
-        
-            else if(choicea== 2)
-            {
-                scheduleAppointment(); 
-            }
-        
-            else if(choicea== 3)
-            {
-                cancelAppointment();
-            }
-            else
-            {
-                cout<<"Invalid choice"<<endl;
-                return 0;
-            }
-            
-            break;
- 
+                else if(choicea== 3)
+                {
+                    cancelAppointment();
+                }
+                else
+                {
+                    cout<<"Invalid choice"<<endl;
+                    return 0;
+                }
+                
+                break;
             case 4:
                 int opt;
                 cout<<endl<<"==========Treatment And Billing Management=========="<<endl;
@@ -214,7 +215,7 @@ int main() {
                     default:
                         cout<<endl<<"Invalid option"<<endl;
                 }
-            break;
+                break;
             case 5:
                 cout<<endl<<"==========Search And Reports=========="<<endl;
                 cout<<endl<<"1. Search Patient"<<endl;
@@ -405,10 +406,138 @@ void addPatient() {
 void addDoctor() {
 
 }
-void updatePatient() {
-
+void updatePatient(ofstream &outFile, ifstream &inFile) {
+    Patient p1;
+    int idCheck, ageTemp;
+    string nameTemp, contactTemp, genderTemp;
+    bool isfound = false; 
+    double balanceTemp;
+    cout<<"Enter Patients ID whose data you want to update: ";
+    cin>>idCheck;
+    while(inFile>>p1.patientId) {
+        inFile.ignore();
+        getline(inFile ,p1.name, '#');
+        inFile>>p1.age;
+        inFile.ignore();
+        getline(inFile, p1.gender, '#');
+        getline(inFile, p1.contact, '#');
+        inFile>>p1.balance;
+        inFile.ignore();
+        if (idCheck == p1.patientId) {
+            cout<<endl<<"ID Found"<<endl;
+            isfound = true;
+            break;
+        }
+    }
+    if (isfound == false) {
+        cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
+        return;
+    }
+    cout<<endl<<"==========Update Patient=========="<<endl;
+    cout<<"1. Update Name"<<endl;
+    cout<<"2. Update Age"<<endl;
+    cout<<"3. Update Contact"<<endl;
+    cout<<"4. Update Balance"<<endl;
+    cout<<"5. Update Gender"<<endl;
+    cout<<"Enter a Valid Option: ";
+    int option;
+    cin>>option;
+    cin.ignore();
+    switch(option) {
+        case 1:
+            cout<<"Enter Name of Patient: ";
+            getline(cin,nameTemp);
+            cout<<"Name Updated to "<<nameTemp<<endl;
+            p1.name = nameTemp;
+            break;
+        case 2:
+            cout<<"Enter age: ";
+            cin>>ageTemp;
+            cin.ignore();
+            cout<<"New age is "<<ageTemp<<endl;
+            p1.age = ageTemp;
+            break;
+        case 3:
+            cout<<"Enter Contact(11 digits): ";
+            getline(cin, contactTemp);
+            cout<<"New Contact is "<<contactTemp<<endl;
+            p1.contact = contactTemp;
+            break;
+        case 4:
+            cout<<"Enter Balance: ";
+            cin>>balanceTemp;
+            cin.ignore();
+            cout<<"New balance is "<<balanceTemp<<endl;
+            p1.balance = balanceTemp;
+            break;
+        case 5:
+            cout<<"Enter gender: ";
+            getline(cin, genderTemp);
+            cout<<"New gender is "<<genderTemp<<endl;
+            p1.gender = genderTemp;
+            break;
+        default:
+            cout<<"Invalid Option"<<endl;
+            break;
+    }
+    outFile<<p1.patientId<<"#"<<p1.name<<"#"<<p1.age<<"#"<<p1.gender<<"#"<<p1.contact<<"#"<<p1.balance<<endl;
+    removeDuplicatePatients();
+    cout<<"File Updated"<<endl;
 }
-void updateDoctor() {
+void updateDoctor(ofstream &outFile, ifstream &inFile) {
+    Doctor d1;
+    int idCheck;
+    bool isfound = false; 
+    cout<<"Enter Doctors ID whose data you want to update: ";
+    cin>>idCheck;
+    while(inFile>>d1.doc_id) {
+        inFile.ignore();
+        getline(inFile ,d1.name, '#');
+        getline(inFile, d1.specialty, '#');
+        inFile>>d1.experience;
+        inFile.ignore();
+        if (idCheck == d1.doc_id) {
+            cout<<endl<<"ID Found"<<endl;
+            isfound = true;
+            break;
+        }
+    }
+    if (isfound == false) {
+        cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
+        return;
+    }
+    cout<<endl<<"==========Update Patient=========="<<endl;
+    cout<<"1. Update Name"<<endl;
+    cout<<"2. Update Speciality"<<endl;
+    cout<<"3. Update Experience"<<endl;
+    cout<<"Enter a Valid Option: ";
+    int option;
+    cin>>option;
+    cin.ignore();
+    switch(option) {
+        case 1:
+            cout<<"Enter Name of Doctor: ";
+            getline(cin,d1.name);
+            cout<<"Name Updated to "<<d1.name<<endl;
+            break;
+        case 2:
+            cout<<"Enter Speciality: ";
+            getline(cin, d1.specialty);
+            cout<<"New Speciality is "<<d1.specialty<<endl;
+            break;
+        case 3:
+            cout<<"Enter experience: ";
+            cin>>d1.experience;
+            cin.ignore();
+            cout<<"New Experience is "<<d1.experience<<endl;
+            break;
+        default:
+            cout<<"Invalid Option"<<endl;
+            break;
+    }
+    outFile<<d1.doc_id<<"#"<<d1.name<<"#"<<d1.specialty<<"#"<<d1.experience<<endl;
+    removeDuplicatePatients();
+    cout<<"File Updated"<<endl;
 
 }
 void deletePatient() {
@@ -424,5 +553,11 @@ void viewDoctors() {
 
 }
 void viewAppointments() {
+
+}
+void cleanFile() {
+
+}
+void removeDuplicatePatients() {
 
 }
