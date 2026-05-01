@@ -50,7 +50,7 @@ void updatePayment(ifstream &in);
 void generateBill(ifstream &in);
 void searchDoctorBySpecialty();
 void searchPatientBydoc_ID();
-void viewTreatmentsByDoctor();
+void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile);
 void sortDoctorsByExperience();
 void viewAppointments();
 void cleanFile();
@@ -331,7 +331,7 @@ int main() {
                         break;
                     case 3:
                         cout<<endl<<"==========Search Treatment By Doc ID=========="<<endl;
-                        void viewTreatmentsByDoctor();
+                        viewTreatmentsByDoctor(appointmentIn, treatmentIn);
                         break;
                     case 4:
                         cout<<endl<<"==========Generate Bill=========="<<endl;
@@ -364,6 +364,8 @@ void addTreatment(Treatment t1) {
 }
 
 void viewTreatment(ifstream &treatmentFile) {
+    treatmentFile.clear();
+    treatmentFile.seekg(0, ios::beg);
     cout<<endl<<"==========View Treatment=========="<<endl;
     Treatment *t1 = new Treatment;
     cout<<left<<setw(30)<<"Patient Id"<<setw(30)<<"Description"<<setw(30)<<"Cost"<<setw(30)<<"Paid"<<endl;
@@ -402,7 +404,39 @@ void searchDoctorBySpecialty() {
 
 }
 
-void viewTreatmentsByDoctor() {
+void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile) {
+    appointmentFile.clear();
+    appointmentFile.seekg(0, ios::beg);
+    treatmentFile.clear();
+    treatmentFile.seekg(0, ios::beg);
+    Treatment *t1 = new Treatment;
+    Appointment *a1 = new Appointment;
+    cout<<"Enter doc id to see all treatments given by a doctor: ";
+    int docTemp;
+    cin>>docTemp;
+    cout<<left<<setw(20)<<"Doc ID"<<setw(20)<<"Patient ID"<<setw(20)<<"Description"<<setw(20)<<"Cost"<<setw(20)<<"Paid"<<endl;
+    while(appointmentFile>>a1->patientId) {
+        appointmentFile.ignore();
+        appointmentFile>>a1->doctorId;
+        appointmentFile.ignore();
+        appointmentFile.getline(a1->date, 11, '#');
+        appointmentFile.getline(a1->time, 10, '\n');
+        if (docTemp == a1->doctorId) {
+            treatmentFile.clear();
+            treatmentFile.seekg(0, ios::beg);
+            while(treatmentFile>>t1->patientId) {
+                string temp;
+                treatmentFile.ignore();
+                getline(treatmentFile, t1->description, '#');
+                treatmentFile>>t1->cost;
+                treatmentFile.ignore();
+                getline(treatmentFile, temp, '\n');
+                if (t1->patientId == a1->patientId) {
+                    cout<<left<<setw(20)<<a1->doctorId<<setw(20)<<t1->patientId<<setw(20)<<t1->description<<setw(20)<<t1->cost<<setw(20)<<temp<<endl;
+                }
+            }
+        }
+    }
 
 }
 void sortDoctorsByExperience() {
@@ -412,6 +446,8 @@ void scheduleAppointment() {
 
 }
 void cancelAppointment(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
     cout<<endl<<"==========Cancel Appointment=========="<<endl;
     Appointment *a1 = new Appointment;
     ofstream out("temp.txt");
@@ -441,6 +477,8 @@ void addDoctor() {
 
 }
 void updatePatient(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
     Patient *p1 = new Patient;
     int idCheck;
     ofstream tempFile("tempFile.txt");
@@ -518,6 +556,9 @@ void updatePatient(ifstream &inFile) {
     delete p1;
 }
 void updateDoctor(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+    
     Doctor *d1 = new Doctor;
     int idCheck;
     ofstream tempFile("temp.txt");
@@ -583,6 +624,9 @@ void deleteDoctor() {
 
 }
 void viewPatients(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+    
     Patient *p1 = new Patient;
     cout<<endl<<"==========View Patients=========="<<endl;
     cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Age"<<setw(20)<<"Gender"<<setw(20)<<"Contact"<<setw(20)<<"Ballance"<<endl;
@@ -600,6 +644,9 @@ void viewPatients(ifstream &inFile) {
     delete p1;
 }
 void viewDoctors(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+    
     Doctor *d1 = new Doctor;
     cout<<endl<<"==========View Doctors=========="<<endl;
     cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Speciality"<<setw(20)<<"Experience"<<endl;
@@ -727,29 +774,34 @@ void cleanAppointment(ifstream &inFile) {
             inFile.getline(a1->time, 10);
             char day[3], month[3], year[5], first[5];
             int i = 0, j = 0;
-            for(j = 0; a1->date[j] != '-'; j++)
+            for(j = 0; a1->date[j] != '-'; j++) {
                 first[j] = a1->date[j];
+            }
             first[j] = '\0';
             if(strlen(first) == 4) {
                 strcpy(year, first);
                 i = j + 1;
-                for(j = 0; a1->date[i + j] != '-'; j++)
+                for(j = 0; a1->date[i + j] != '-'; j++) {
                     month[j] = a1->date[i + j];
+                }
                 month[j] = '\0';
                 i = i + j + 1;
-                for(j = 0; a1->date[i + j] != '\0'; j++)
+                for(j = 0; a1->date[i + j] != '\0'; j++) {
                     day[j] = a1->date[i + j];
+                }
                 day[j] = '\0';
             }
             else {
                 strcpy(month, first);
                 i = j + 1;
-                for(j = 0; a1->date[i + j] != '-'; j++)
+                for(j = 0; a1->date[i + j] != '-'; j++) {
                     day[j] = a1->date[i + j];
+                }
                 day[j] = '\0';
                 i = i + j + 1;
-                for(j = 0; a1->date[i + j] != '\0'; j++)
+                for(j = 0; a1->date[i + j] != '\0'; j++) {
                     year[j] = a1->date[i + j];
+                }
                 year[j] = '\0';
             }
             bool is24hour = true;
