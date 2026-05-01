@@ -375,6 +375,25 @@ void addTreatment(Treatment t1) {
 
 void viewTreatment(ifstream &treatmentFile) {
     cout<<endl<<"==========View Treatment=========="<<endl;
+    Treatment *t1 = new Treatment;
+    cout<<left<<setw(30)<<"Patient Id"<<setw(30)<<"Description"<<setw(30)<<"Cost"<<setw(30)<<"Paid"<<endl;
+    while(treatmentFile>>t1->patientId) {
+        treatmentFile.ignore();
+        string temp;
+        getline(treatmentFile, t1->description, '#');
+        treatmentFile>>t1->cost;
+        treatmentFile.ignore();
+        getline(treatmentFile, temp, '\n');
+        t1->paid = (temp == "true");
+        cout<<left<<setw(30)<<t1->patientId<<setw(30)<<t1->description<<setw(30)<<t1->cost;
+        if(t1->paid == true) {
+            cout<<setw(30)<<"true"<<endl;
+        }
+        else {
+            cout<<setw(30)<<"false"<<endl;
+        }
+    }
+    delete t1;
 }
 
 void updatePayment(ifstream &in, ofstream &out) {
