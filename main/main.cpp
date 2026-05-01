@@ -48,7 +48,7 @@ void addTreatment(Treatment t1);
 void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in);
 void generateBill(ifstream &in);
-void searchDoctorBySpecialty();
+void searchDoctorBySpecialty(ifstream &infile);
 void searchPatientBydoc_ID();
 void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile);
 void sortDoctorsByExperience();
@@ -351,7 +351,7 @@ int main() {
                                 }
                         }
                         else if (sel == 2) {
-                            searchDoctorBySpecialty();
+                            searchDoctorBySpecialty(doctorIn);
                         }
                         else {
                             cout<<endl<<"Invalid Option"<<endl;
@@ -458,8 +458,26 @@ void searchPatientBydoc_ID() {
 
 }
 
-void searchDoctorBySpecialty() {
-
+void searchDoctorBySpecialty(ifstream &inFile) {
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+    Doctor *d1 = new Doctor;
+    cout<<endl<<"==========Search Doctors By Speciality=========="<<endl;
+    cout<<"Enter Speciality to search doctors: ";
+    string temp;
+    getline(cin, temp);
+    cout<<left<<setw(20)<<"ID"<<setw(20)<<"Name"<<setw(20)<<"Speciality"<<setw(20)<<"Experience"<<endl;
+    while(inFile>>d1->doc_id) {
+        inFile.ignore();
+        getline(inFile ,d1->name, '#');
+        getline(inFile, d1->specialty, '#');
+        inFile>>d1->experience;
+        inFile.ignore();
+        if (temp == d1-> specialty) {
+            cout<<left<<setw(20)<<d1->doc_id<<setw(20)<<d1->name<<setw(20)<<d1->specialty<<setw(20)<<d1->experience<<endl;
+        }
+    }
+    delete d1;
 }
 
 void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile) {
