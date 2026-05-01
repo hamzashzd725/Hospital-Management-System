@@ -2,7 +2,7 @@
 #include <iostream>
 #include <string>
 #include <iomanip>
-
+#include <cstring>
 using namespace std;
 
 const int passwd = 123;
@@ -57,7 +57,7 @@ void cleanFile();
 void removeDuplicatePatients();
 void cleanDoctor(ifstream &inFile);
 void cleanPatient(ifstream &inFile);
-void cleanAppoitment(ifstream &inFile);
+void cleanAppointment(ifstream &inFile);
 void cleanTreatment(ifstream &inFile);
 bool isValidRecord(int count, string line);
 
@@ -207,7 +207,6 @@ int main() {
                         addTreatment(t1);
                         break;
                     case 2:
-                        cout<<endl<<"==========View Treatments=========="<<endl;
                         viewTreatment(treatmentIn);
                         break;
                     case 3:
@@ -590,14 +589,40 @@ void viewAppointments() {
 }
 void cleanFile() {
     ifstream patientFile("patients.txt"); 
+    ifstream treatmentFile("treatments.txt");
+    ifstream doctorFile("doctors.txt");
+    ifstream appointmentFile("appointments.txt");
     cleanPatient(patientFile);
+    cleanTreatment(treatmentFile);
+    cleanDoctor(doctorFile);
+    cleanAppointment(appointmentFile);
     patientFile.close();
+    treatmentFile.close();
+    doctorFile.close();
+    appointmentFile.close();
 }
 void removeDuplicatePatients() {
 
 }
 
 void cleanDoctor(ifstream &inFile) {
+    Doctor *d1 = new Doctor;
+    ofstream out("temp.txt");
+    string line;
+    while(true) {
+        if(!getline(inFile, line)) {
+            break;
+        }
+        bool valid = isValidRecord(3, line);
+        if (valid == false) {
+            continue;
+        }
+        out<<line<<endl;
+    }
+    remove("doctors.txt");
+    rename("temp.txt", "doctors.txt");
+    out.close();
+    delete d1;
 
 }
 void cleanPatient(ifstream &inFile) {
@@ -655,11 +680,120 @@ void cleanPatient(ifstream &inFile) {
     outFile.close();
     delete p1;
 }
-void cleanAppoitment(ifstream &inFile) {
-
+void cleanAppointment(ifstream &inFile) {
+    Appointment *a1 = new Appointment;
+    ofstream out("temp.txt");
+    string line;
+    while(true) {
+        long pos = inFile.tellg();
+        if(!getline(inFile, line)) break;
+        bool valid = isValidRecord(3, line);
+        if (valid == true) {
+            inFile.seekg(pos);
+            inFile>>a1->patientId;
+            inFile.ignore();
+            inFile>>a1->doctorId;
+            inFile.ignore();
+            inFile.getline(a1->date, 11, '#');
+            inFile.getline(a1->time, 10);
+            char day[3], month[3], year[5], first[5];
+            int i = 0, j = 0;
+            for(j = 0; a1->date[j] != '-'; j++)
+                first[j] = a1->date[j];
+            first[j] = '\0';
+            if(strlen(first) == 4) {
+                strcpy(year, first);
+                i = j + 1;
+                for(j = 0; a1->date[i + j] != '-'; j++)
+                    month[j] = a1->date[i + j];
+                month[j] = '\0';
+                i = i + j + 1;
+                for(j = 0; a1->date[i + j] != '\0'; j++)
+                    day[j] = a1->date[i + j];
+                day[j] = '\0';
+            }
+            else {
+                strcpy(month, first);
+                i = j + 1;
+                for(j = 0; a1->date[i + j] != '-'; j++)
+                    day[j] = a1->date[i + j];
+                day[j] = '\0';
+                i = i + j + 1;
+                for(j = 0; a1->date[i + j] != '\0'; j++)
+                    year[j] = a1->date[i + j];
+                year[j] = '\0';
+            }
+            bool is24hour = true;
+            for(int k = 0; a1->time[k] != '\0'; k++) {
+                if(a1->time[k] == 'A' || a1->time[k] == 'P') {
+                    is24hour = false;
+                    break;
+                }
+            }
+            char convertedTime[10];
+            if(is24hour) {
+                char hourStr[3];
+                int k;
+                for(k = 0; a1->time[k] != ':'; k++)
+                    hourStr[k] = a1->time[k];
+                hourStr[k] = '\0';
+                int hour = atoi(hourStr);
+                char newHour[3];
+                if(hour == 0)
+                    strcpy(newHour, "12");
+                else if(hour <= 12)
+                    strcpy(newHour, hourStr);
+                else {
+                    hour = hour - 12;
+                    if(hour < 10) {
+                        newHour[0] = '0';
+                        newHour[1] = '0' + hour;
+                        newHour[2] = '\0';
+                    }
+                    else {
+                        newHour[0] = '0' + hour / 10;
+                        newHour[1] = '0' + hour % 10;
+                        newHour[2] = '\0';
+                    }
+                }
+                strcpy(convertedTime, newHour);
+                strcat(convertedTime, a1->time + k);
+                if(hour == 0 || hour < 12)
+                    strcat(convertedTime, " AM");
+                else
+                    strcat(convertedTime, " PM");
+            }
+            else {
+                strcpy(convertedTime, a1->time);
+            }
+            out<<a1->patientId<<"#"<<a1->doctorId<<"#"
+               <<month<<"-"<<day<<"-"<<year
+               <<"#"<<convertedTime<<endl;
+        }
+    }
+    remove("appointments.txt");
+    rename("temp.txt", "appointments.txt");
+    out.close();
+    delete a1;
 }
 void cleanTreatment(ifstream &inFile) {
-
+    Treatment *t1 = new Treatment;
+    ofstream out("temp.txt");
+    string line;
+    while(true) {
+        if(!getline(inFile, line)) {
+            break;
+        }
+        bool valid = isValidRecord(3, line);
+        if (valid == false) {
+            continue;
+        }
+        out<<line<<endl;
+    }
+    remove("treatments.txt");
+    rename("temp.txt", "treatments.txt");
+    out.close();
+    delete t1;
 }
 bool isValidRecord(int count, string line) {
     int hash = 0;
