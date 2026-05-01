@@ -111,6 +111,7 @@ int main() {
                 cout<<"Enter option: ";
                 int choicep;
                 cin >> choicep;
+                cin.ignore();
                 if (choicep==1) {
                     addPatient();
                 }
@@ -140,6 +141,7 @@ int main() {
                 int choiced;
                 cout<<"Enter Option: ";
                 cin>>choiced;
+                cin.ignore();
                 if(choiced== 1) {
                     addDoctor();
                 }
@@ -169,7 +171,7 @@ int main() {
                 cout<<"Enter Option: ";
                 int choicea;
                 cin>>choicea;
-                
+                cin.ignore();
                 if(choicea== 1)
                 {
                     viewAppointments();
@@ -200,6 +202,7 @@ int main() {
                 cout<<"4. Generate Bill"<<endl;
                 cout<<endl<<"Enter Option: ";
                 cin>>opt;
+                cin.ignore();
                 switch(opt) {
                     case 1:
                         addTreatment(t1);
@@ -236,14 +239,23 @@ int main() {
                         cout<<endl<<"2. Search by Patient Name"<<endl;
                         cout<<endl<<"Enter Your Choice: ";
                         cin>>o;
-
+                        cin.ignore();
                         if (o ==  1) {
                                 cout<<endl<<"==========Enter Patient ID=========="<<endl;
                                 int id;
                                 bool found = false;
                                 cout<<endl<<"Enter Patient ID: ";
                                 cin>>id;
-                                while(patientIn>>p1.patientId>>p1.name>>p1.age>>p1.gender>>p1.contact) {
+                                cin.ignore();
+                                while(patientIn>>p1.patientId) {
+                                    patientIn.ignore();
+                                    getline(patientIn, p1.name, '#');
+                                    patientIn>>p1.age;
+                                    patientIn.ignore();
+                                    getline(patientIn, p1.gender, '#');
+                                    getline(patientIn, p1.contact, '#');
+                                    patientIn>>p1.balance;
+                                    patientIn.ignore();
                                     if (p1.patientId == id) {
                                         found = true;
                                         break;
@@ -268,7 +280,16 @@ int main() {
                                 bool found = false;
                                 cout<<endl<<"Enter Patient ID: ";
                                 getline(cin, name);
-                                while(patientIn>>p1.patientId>>p1.name>>p1.age>>p1.gender>>p1.contact) {
+                                while(patientIn>>p1.patientId) {
+                                    patientIn.ignore();
+                                    getline(patientIn, p1.name, '#');
+                                    patientIn>>p1.age;
+                                    patientIn.ignore();
+                                    getline(patientIn, p1.gender, '#');
+                                    getline(patientIn, p1.contact, '#');
+                                    patientIn>>p1.balance;
+                                    patientIn.ignore();
+                                
                                     if (p1.name == name) {
                                         found = true;
                                         break;
@@ -298,13 +319,20 @@ int main() {
                         cout<<endl<<"2. Search Doctor By Speciality"<<endl;
                         cout<<endl<<"Enter Option: ";
                         cin>>sel;
-                        if (0 ==  1) {
+                        cin.ignore();
+                        if (sel ==  1) {
                                 cout<<endl<<"==========Enter Doctor ID=========="<<endl;
                                 int id;
                                 bool found = false;
                                 cout<<endl<<"Enter Doctor ID: ";
                                 cin>>id;
-                                while(doctorIn>>d1.doc_id>>d1.name>>d1.specialty>>d1.experience) {
+                                cin.ignore();
+                                while(doctorIn>>d1.doc_id) {
+                                    doctorIn.ignore();
+                                    getline(doctorIn, d1.name, '#');
+                                    getline(doctorIn, d1.specialty, '#');
+                                    doctorIn>>d1.experience;
+                                    doctorIn.ignore();
                                     if (d1.doc_id == id) {
                                         found = true;
                                         break;
@@ -322,7 +350,7 @@ int main() {
                                     cout<<endl<<"Doctor Not Found"<<endl;
                                 }
                         }
-                        else if (o == 2) {
+                        else if (sel == 2) {
                             searchDoctorBySpecialty();
                         }
                         else {
