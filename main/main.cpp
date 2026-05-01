@@ -135,8 +135,8 @@ int main() {
                 cout << "3. Delete Doctor"<<endl;
                 cout << "4. View All Doctors"<<endl;
                 int choiced;
-                cin>>choiced;
                 cout<<"Enter Option: ";
+                cin>>choiced;
                 if(choiced== 1) {
                     addDoctor();
                 }
@@ -370,7 +370,7 @@ void addTreatment(Treatment t1) {
 }
 
 void viewTreatment(ifstream &treatmentFile) {
-
+    cout<<endl<<"==========View Treatment=========="<<endl;
 }
 
 void updatePayment(ifstream &in, ofstream &out) {
@@ -411,6 +411,7 @@ void updatePatient(ofstream &outFile, ifstream &inFile) {
     Patient p1;
     int idCheck, ageTemp;
     string nameTemp, contactTemp, genderTemp;
+    ofstream tempFile("tempFile.txt");
     bool isfound = false; 
     double balanceTemp;
     cout<<"Enter Patients ID whose data you want to update: ";
@@ -426,68 +427,73 @@ void updatePatient(ofstream &outFile, ifstream &inFile) {
         inFile.ignore();
         if (idCheck == p1.patientId) {
             cout<<endl<<"ID Found"<<endl;
+            
             isfound = true;
-            break;
+            cout<<endl<<"==========Update Patient=========="<<endl;
+            cout<<"1. Update Name"<<endl;
+            cout<<"2. Update Age"<<endl;
+            cout<<"3. Update Contact"<<endl;
+            cout<<"4. Update Balance"<<endl;
+            cout<<"5. Update Gender"<<endl;
+            cout<<"Enter a Valid Option: ";
+            int option;
+            cin>>option;
+            cin.ignore();
+            switch(option) {
+                case 1:
+                    cout<<"Enter Name of Patient: ";
+                    getline(cin,nameTemp);
+                    cout<<"Name Updated to "<<nameTemp<<endl;
+                    p1.name = nameTemp;
+                    break;
+                case 2:
+                    cout<<"Enter age: ";
+                    cin>>ageTemp;
+                    cin.ignore();
+                    cout<<"New age is "<<ageTemp<<endl;
+                    p1.age = ageTemp;
+                    break;
+                case 3:
+                    cout<<"Enter Contact(11 digits): ";
+                    getline(cin, contactTemp);
+                    cout<<"New Contact is "<<contactTemp<<endl;
+                    p1.contact = contactTemp;
+                    break;
+                case 4:
+                    cout<<"Enter Balance: ";
+                    cin>>balanceTemp;
+                    cin.ignore();
+                    cout<<"New balance is "<<balanceTemp<<endl;
+                    p1.balance = balanceTemp;
+                    break;
+                case 5:
+                    cout<<"Enter gender: ";
+                    getline(cin, genderTemp);
+                    cout<<"New gender is "<<genderTemp<<endl;
+                    p1.gender = genderTemp;
+                    break;
+                default:
+                    cout<<"Invalid Option"<<endl;
+                    break;
+            }
         }
+        tempFile<<p1.patientId<<"#"<<p1.name<<"#"<<p1.age<<"#"<<p1.gender<<"#"<<p1.contact<<"#"<<p1.balance<<endl;
+        
     }
     if (isfound == false) {
         cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
         return;
     }
-    cout<<endl<<"==========Update Patient=========="<<endl;
-    cout<<"1. Update Name"<<endl;
-    cout<<"2. Update Age"<<endl;
-    cout<<"3. Update Contact"<<endl;
-    cout<<"4. Update Balance"<<endl;
-    cout<<"5. Update Gender"<<endl;
-    cout<<"Enter a Valid Option: ";
-    int option;
-    cin>>option;
-    cin.ignore();
-    switch(option) {
-        case 1:
-            cout<<"Enter Name of Patient: ";
-            getline(cin,nameTemp);
-            cout<<"Name Updated to "<<nameTemp<<endl;
-            p1.name = nameTemp;
-            break;
-        case 2:
-            cout<<"Enter age: ";
-            cin>>ageTemp;
-            cin.ignore();
-            cout<<"New age is "<<ageTemp<<endl;
-            p1.age = ageTemp;
-            break;
-        case 3:
-            cout<<"Enter Contact(11 digits): ";
-            getline(cin, contactTemp);
-            cout<<"New Contact is "<<contactTemp<<endl;
-            p1.contact = contactTemp;
-            break;
-        case 4:
-            cout<<"Enter Balance: ";
-            cin>>balanceTemp;
-            cin.ignore();
-            cout<<"New balance is "<<balanceTemp<<endl;
-            p1.balance = balanceTemp;
-            break;
-        case 5:
-            cout<<"Enter gender: ";
-            getline(cin, genderTemp);
-            cout<<"New gender is "<<genderTemp<<endl;
-            p1.gender = genderTemp;
-            break;
-        default:
-            cout<<"Invalid Option"<<endl;
-            break;
-    }
-    outFile<<p1.patientId<<"#"<<p1.name<<"#"<<p1.age<<"#"<<p1.gender<<"#"<<p1.contact<<"#"<<p1.balance<<endl;
+    remove("patients.txt");
+    rename("tempFile.txt", "patients.txt");
     removeDuplicatePatients();
+    tempFile.close();
     cout<<"File Updated"<<endl;
 }
 void updateDoctor(ofstream &outFile, ifstream &inFile) {
     Doctor d1;
     int idCheck;
+    ofstream tempFile("temp.txt");
     bool isfound = false; 
     cout<<"Enter Doctors ID whose data you want to update: ";
     cin>>idCheck;
@@ -500,44 +506,46 @@ void updateDoctor(ofstream &outFile, ifstream &inFile) {
         if (idCheck == d1.doc_id) {
             cout<<endl<<"ID Found"<<endl;
             isfound = true;
-            break;
+
+            cout<<endl<<"==========Update Patient=========="<<endl;
+            cout<<"1. Update Name"<<endl;
+            cout<<"2. Update Speciality"<<endl;
+            cout<<"3. Update Experience"<<endl;
+            cout<<"Enter a Valid Option: ";
+            int option;
+            cin>>option;
+            cin.ignore();
+            switch(option) {
+                case 1:
+                    cout<<"Enter Name of Doctor: ";
+                    getline(cin,d1.name);
+                    cout<<"Name Updated to "<<d1.name<<endl;
+                    break;
+                case 2:
+                    cout<<"Enter Speciality: ";
+                    getline(cin, d1.specialty);
+                    cout<<"New Speciality is "<<d1.specialty<<endl;
+                    break;
+                case 3:
+                    cout<<"Enter experience: ";
+                    cin>>d1.experience;
+                    cin.ignore();
+                    cout<<"New Experience is "<<d1.experience<<endl;
+                    break;
+                default:
+                    cout<<"Invalid Option"<<endl;
+                    break;
+            }
         }
+        tempFile<<d1.doc_id<<"#"<<d1.name<<"#"<<d1.specialty<<"#"<<d1.experience<<endl;
     }
     if (isfound == false) {
         cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
         return;
     }
-    cout<<endl<<"==========Update Patient=========="<<endl;
-    cout<<"1. Update Name"<<endl;
-    cout<<"2. Update Speciality"<<endl;
-    cout<<"3. Update Experience"<<endl;
-    cout<<"Enter a Valid Option: ";
-    int option;
-    cin>>option;
-    cin.ignore();
-    switch(option) {
-        case 1:
-            cout<<"Enter Name of Doctor: ";
-            getline(cin,d1.name);
-            cout<<"Name Updated to "<<d1.name<<endl;
-            break;
-        case 2:
-            cout<<"Enter Speciality: ";
-            getline(cin, d1.specialty);
-            cout<<"New Speciality is "<<d1.specialty<<endl;
-            break;
-        case 3:
-            cout<<"Enter experience: ";
-            cin>>d1.experience;
-            cin.ignore();
-            cout<<"New Experience is "<<d1.experience<<endl;
-            break;
-        default:
-            cout<<"Invalid Option"<<endl;
-            break;
-    }
-    outFile<<d1.doc_id<<"#"<<d1.name<<"#"<<d1.specialty<<"#"<<d1.experience<<endl;
-    removeDuplicatePatients();
+    remove("doctors.txt");
+    rename("temp.txt", "doctors.txt");
+    tempFile.close();
     cout<<"File Updated"<<endl;
 
 }
