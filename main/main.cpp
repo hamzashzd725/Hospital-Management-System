@@ -35,7 +35,7 @@ struct Treatment {
 };
 
 void scheduleAppointment();
-void cancelAppointment();
+void cancelAppointment(ifstream &inFile);
 void addPatient();
 void addDoctor();
 void updatePatient(ifstream &inFile);
@@ -46,7 +46,7 @@ void viewPatients(ifstream &inFile);
 void viewDoctors(ifstream &inFile);
 void addTreatment(Treatment t1);
 void viewTreatment(ifstream &treatmentFile);
-void updatePayment(ifstream &in, ofstream &out);
+void updatePayment(ifstream &in);
 void generateBill(ifstream &in);
 void searchDoctorBySpecialty();
 void searchPatientBydoc_ID();
@@ -69,17 +69,15 @@ int main() {
     Patient p1;
     Doctor d1;
     cleanFile();
-    ofstream treatmentOut("treatments.txt", ios::app);
     ifstream treatmentIn("treatments.txt");
     
-    ofstream billOut("bills.txt", ios::app);
     ifstream billIn("bills.txt");
 
     ifstream patientIn("patients.txt");
-    ofstream patientOut("patients.txt", ios::app);
     
     ifstream doctorIn("doctors.txt");
-    ofstream doctorOut("doctors.txt", ios::app);
+    
+    ifstream appointmentIn("appointments.txt");
 
     cout<<"Enter User ID: ";
     cin>>id;
@@ -184,7 +182,7 @@ int main() {
             
                 else if(choicea== 3)
                 {
-                    cancelAppointment();
+                    cancelAppointment(appointmentIn);
                 }
                 else
                 {
@@ -211,7 +209,7 @@ int main() {
                         break;
                     case 3:
                         cout<<endl<<"==========Update Payment Status=========="<<endl;
-                        updatePayment(billIn, billOut);
+                        updatePayment(billIn);
                         break;
                     case 4:
                         cout<<endl<<"==========Generate Bill=========="<<endl;
@@ -362,15 +360,7 @@ int main() {
 }
 
 void addTreatment(Treatment t1) {
-    cout<<endl<<"==========Add Treatment Records for Patient=========="<<endl;
-    cout<<"Enter Patient Id to enter record: ";
-    cin>>t1.patientId;
-    cout<<"Enter Treatment details: ";
-    getline(cin, t1.description);
-    cout<<"Enter treatment Cost: ";
-    cin>>t1.cost;
-    cout<<"Is the bill paid(1 for yes, 0 for no)? ";
-    cin>>t1.paid;
+    
 }
 
 void viewTreatment(ifstream &treatmentFile) {
@@ -396,7 +386,7 @@ void viewTreatment(ifstream &treatmentFile) {
     delete t1;
 }
 
-void updatePayment(ifstream &in, ofstream &out) {
+void updatePayment(ifstream &in) {
 
 }
 
@@ -421,8 +411,28 @@ void sortDoctorsByExperience() {
 void scheduleAppointment() {
 
 }
-void cancelAppointment() {
-
+void cancelAppointment(ifstream &inFile) {
+    cout<<endl<<"==========Cancel Appointment=========="<<endl;
+    Appointment *a1 = new Appointment;
+    ofstream out("temp.txt");
+    int tempId;
+    cout<<"Enter Patient ID to cancel appointment: ";
+    cin>>tempId;
+    while(inFile>>a1->patientId) {
+        inFile.ignore();
+        inFile>>a1->doctorId;
+        inFile.ignore();
+        inFile.getline(a1->date, 11, '#');
+        inFile.getline(a1->time, 10, '\n');
+        if (a1->patientId == tempId) {
+            continue;
+        }
+        out<<a1->patientId<<"#"<<a1->doctorId<<"#"<<a1->date<<"#"<<a1->time<<endl;
+    }
+    remove("appointments.txt");
+    rename("temp.txt", "appointments.txt");
+    out.close();
+    delete a1;
 }
 void addPatient() {
 
