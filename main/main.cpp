@@ -369,7 +369,7 @@ int main() {
                         generateBill(billIn);
                         break;
                     case 5:
-                        cout<<endl<<"==========Sort Doctors By Experience=========="<<endl;
+                        cout<<endl<<"==========Sort and View Doctors By Experience=========="<<endl;
                         sortDoctorsByExperience(doctorIn);
                         break;
                     default:
@@ -386,7 +386,10 @@ int main() {
         cout<<"Do you want to Continue(y/n)? ";
         cin>>option;
     }
-
+    treatmentIn.close();
+    patientIn.close();
+    billIn.close();
+    appointmentIn.close();
     return 0;
 }
 
@@ -420,6 +423,8 @@ void viewTreatment(ifstream &treatmentFile) {
 }
 
 void updatePayment(ifstream &in) {
+    in.clear();
+    in.seekg(0, ios::beg);
     int patientId, cost;
     string paid;
     ofstream out("temp.txt");
@@ -449,8 +454,10 @@ void updatePayment(ifstream &in) {
     }
     cout<<"Bills.txt Update"<<endl;
     out.close();
+    in.close();
     remove("bills.txt");
     rename("temp.txt", "bills.txt");
+    in.open("bills.txt");
 }
 
 void generateBill(ifstream &in) {
@@ -559,8 +566,10 @@ void generateBill(ifstream &in) {
     remove("patients.txt");
     rename("temp.txt", "patients.txt");
     tempBills.close();
+    in.close();
     remove("bills.txt");
     rename("temp1.txt", "bills.txt");
+    in.open("bills.txt");
     treatmentFile.close();
     tempTreatments.close();
     remove("treatments.txt");
@@ -663,11 +672,15 @@ void sortDoctorsByExperience(ifstream &inFile) {
            <<doctors[i].specialty<<"#"<<doctors[i].experience<<endl;
     }
     out.close();
+    inFile.close();
     remove("doctors.txt");
     rename("temp.txt", "doctors.txt");
     delete[] doctors;
     cout<<"Doctors sorted by experience."<<endl;
-    viewDoctors(inFile);
+    ifstream newFile("doctors.txt");
+    viewDoctors(newFile);
+    newFile.close();
+    inFile.open("doctors.txt");
 }
 void scheduleAppointment() {
 
@@ -692,10 +705,12 @@ void cancelAppointment(ifstream &inFile) {
         }
         out<<a1->patientId<<"#"<<a1->doctorId<<"#"<<a1->date<<"#"<<a1->time<<endl;
     }
+    inFile.close();
     remove("appointments.txt");
     rename("temp.txt", "appointments.txt");
     out.close();
     delete a1;
+    inFile.open("appointments.txt");
 }
 void addPatient() {
 
@@ -775,12 +790,14 @@ void updatePatient(ifstream &inFile) {
         cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
         return;
     }
+    inFile.close();
     remove("patients.txt");
     rename("tempFile.txt", "patients.txt");
     removeDuplicatePatients();
     tempFile.close();
     cout<<"File Updated"<<endl;
     delete p1;
+    inFile.open("patients.txt");
 }
 void updateDoctor(ifstream &inFile) {
     inFile.clear();
@@ -838,11 +855,13 @@ void updateDoctor(ifstream &inFile) {
         cout<<endl<<"Patient Not Found, Cannot update patient!!"<<endl;
         return;
     }
+    inFile.close();
     remove("doctors.txt");
     rename("temp.txt", "doctors.txt");
     tempFile.close();
     cout<<"File Updated"<<endl;
     delete d1;
+    inFile.open("doctors.txt");
 }
 void deletePatient() {
 
@@ -909,7 +928,6 @@ void removeDuplicatePatients() {
 }
 
 void cleanDoctor(ifstream &inFile) {
-    Doctor *d1 = new Doctor;
     ofstream out("temp.txt");
     string line;
     while(true) {
@@ -925,7 +943,6 @@ void cleanDoctor(ifstream &inFile) {
     remove("doctors.txt");
     rename("temp.txt", "doctors.txt");
     out.close();
-    delete d1;
 
 }
 void cleanPatient(ifstream &inFile) {
@@ -1085,7 +1102,6 @@ void cleanAppointment(ifstream &inFile) {
     delete a1;
 }
 void cleanTreatment(ifstream &inFile) {
-    Treatment *t1 = new Treatment;
     ofstream out("temp.txt");
     string line;
     while(true) {
@@ -1101,7 +1117,6 @@ void cleanTreatment(ifstream &inFile) {
     remove("treatments.txt");
     rename("temp.txt", "treatments.txt");
     out.close();
-    delete t1;
 }
 bool isValidRecord(int count, string line) {
     int hash = 0;
