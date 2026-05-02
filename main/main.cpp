@@ -454,7 +454,117 @@ void updatePayment(ifstream &in) {
 }
 
 void generateBill(ifstream &in) {
-
+    in.clear();
+    in.seekg(0, ios::beg);
+    Treatment *t1 = new Treatment;
+    Patient *p1 = new Patient;
+    int tempId;
+    cout<<"Enter a Patient id to generate bill: ";
+    cin>>tempId;
+    int patientId, cost;
+    string paid;
+    while(in>>patientId) {
+        in.ignore();
+        in>>cost;
+        in.ignore();
+        getline(in, paid, '\n');
+        string temp = "";
+        for(int i = 0; i < paid.length(); i++) {
+            if(paid[i] != '\r')
+                temp += paid[i];
+        }
+        paid = temp;
+        if(patientId == tempId)
+            break;
+    }
+    if(patientId != tempId) {
+        cout<<"Patient bill not found."<<endl;
+        delete t1;
+        delete p1;
+        return;
+    }
+    ifstream patientFile("patients.txt");
+    ofstream tempPatient("temp.txt");
+    while(patientFile>>p1->patientId) {
+        patientFile.ignore();
+        getline(patientFile, p1->name, '#');
+        patientFile>>p1->age;
+        patientFile.ignore();
+        getline(patientFile, p1->gender, '#');
+        getline(patientFile, p1->contact, '#');
+        patientFile>>p1->balance;
+        patientFile.ignore();
+        if(tempId == p1->patientId) {
+            if(p1->balance >= cost) {
+                p1->balance = p1->balance - cost;
+                paid = "Paid";
+            }
+            else {
+                cout<<"Insufficient Funds"<<endl;
+                paid = "Unpaid";
+            }
+        }
+        tempPatient<<p1->patientId<<"#"<<p1->name<<"#"<<p1->age<<"#"<<p1->gender<<"#"<<p1->contact<<"#"<<p1->balance<<endl;
+    }
+    in.clear();
+    in.seekg(0, ios::beg);
+    ofstream tempBills("temp1.txt");
+    int bId, bCost;
+    string bPaid;
+    while(in>>bId) {
+        in.ignore();
+        in>>bCost;
+        in.ignore();
+        getline(in, bPaid, '\n');
+        string temp = "";
+        for(int i = 0; i < bPaid.length(); i++) {
+            if(bPaid[i] != '\r')
+                temp += bPaid[i];
+        }
+        bPaid = temp;
+        if(bId == tempId)
+            bPaid = paid;
+        tempBills<<bId<<"#"<<bCost<<"#"<<bPaid<<endl;
+    }
+    ifstream treatmentFile("treatments.txt");
+    ofstream tempTreatments("temp2.txt");
+    while(treatmentFile>>t1->patientId) {
+        treatmentFile.ignore();
+        getline(treatmentFile, t1->description, '#');
+        treatmentFile>>t1->cost;
+        treatmentFile.ignore();
+        string temp;
+        getline(treatmentFile, temp, '\n');
+        t1->paid = (temp == "true");
+        if(t1->patientId == tempId) {
+            tempTreatments<<t1->patientId<<"#"<<t1->description<<"#"<<t1->cost;
+            if(paid == "Paid")
+                tempTreatments<<"#"<<"true"<<endl;
+            else
+                tempTreatments<<"#"<<"false"<<endl;
+        }
+        else {
+            tempTreatments<<t1->patientId<<"#"<<t1->description<<"#"<<t1->cost<<"#"<<temp<<endl;
+        }
+    }
+    cout<<endl<<"==========Bill=========="<<endl;
+    cout<<"Patient Id: "<<p1->patientId<<endl;
+    cout<<"Cost: "<<cost<<endl;
+    cout<<"Status: "<<paid<<endl;
+    cout<<"New Patient Balance: "<<p1->balance<<endl;
+    delete t1;
+    delete p1;
+    tempPatient.close();
+    patientFile.close();
+    remove("patients.txt");
+    rename("temp.txt", "patients.txt");
+    tempBills.close();
+    remove("bills.txt");
+    rename("temp1.txt", "bills.txt");
+    treatmentFile.close();
+    tempTreatments.close();
+    remove("treatments.txt");
+    rename("temp2.txt", "treatments.txt");
 }
 
 void searchPatientBydoc_ID() {
