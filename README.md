@@ -153,7 +153,7 @@ After login, a menu-driven interface guides the user through all available opera
 
 ## Author
 
-Developed as a semester project for **Programming Fundamentals** — Department of Computer Science.
+Developed as a semester project for **Programming Fundamentals**.
 
 ---
 
