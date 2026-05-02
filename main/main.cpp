@@ -47,7 +47,7 @@ void viewDoctors(ifstream &inFile);
 void addTreatment(Treatment t1);
 void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in);
-void generateBill(ifstream &in);
+void generateBill(ifstream &in, ifstream &patientFile, ifstream &treatmentFile);
 void searchDoctorBySpecialty(ifstream &infile);
 void searchPatientBydoc_ID();
 void viewTreatmentsByDoctor(ifstream &appointmentFile, ifstream &treatmentFile);
@@ -219,7 +219,7 @@ int main() {
                         break;
                     case 4:
                         cout<<endl<<"==========Generate Bill=========="<<endl;
-                        generateBill(billIn);
+                        generateBill(billIn, patientIn, treatmentIn);
                         break;
                     default:
                         cout<<endl<<"Invalid option"<<endl;
@@ -366,7 +366,7 @@ int main() {
                         break;
                     case 4:
                         cout<<endl<<"==========Generate Bill=========="<<endl;
-                        generateBill(billIn);
+                        generateBill(billIn, patientIn, treatmentIn);
                         break;
                     case 5:
                         cout<<endl<<"==========Sort and View Doctors By Experience=========="<<endl;
@@ -460,7 +460,8 @@ void updatePayment(ifstream &in) {
     in.open("bills.txt");
 }
 
-void generateBill(ifstream &in) {
+void generateBill(ifstream &in, ifstream &patientFile, ifstream &treatmentFile) {
+    int newBalance;
     in.clear();
     in.seekg(0, ios::beg);
     Treatment *t1 = new Treatment;
@@ -490,7 +491,6 @@ void generateBill(ifstream &in) {
         delete p1;
         return;
     }
-    ifstream patientFile("patients.txt");
     ofstream tempPatient("temp.txt");
     while(patientFile>>p1->patientId) {
         patientFile.ignore();
@@ -505,6 +505,7 @@ void generateBill(ifstream &in) {
             if(p1->balance >= cost) {
                 p1->balance = p1->balance - cost;
                 paid = "Paid";
+                newBalance = p1->balance;
             }
             else {
                 cout<<"Insufficient Funds"<<endl;
@@ -533,7 +534,6 @@ void generateBill(ifstream &in) {
             bPaid = paid;
         tempBills<<bId<<"#"<<bCost<<"#"<<bPaid<<endl;
     }
-    ifstream treatmentFile("treatments.txt");
     ofstream tempTreatments("temp2.txt");
     while(treatmentFile>>t1->patientId) {
         treatmentFile.ignore();
@@ -558,13 +558,14 @@ void generateBill(ifstream &in) {
     cout<<"Patient Id: "<<p1->patientId<<endl;
     cout<<"Cost: "<<cost<<endl;
     cout<<"Status: "<<paid<<endl;
-    cout<<"New Patient Balance: "<<p1->balance<<endl;
+    cout<<"New Patient Balance: "<<newBalance<<endl;
     delete t1;
     delete p1;
     tempPatient.close();
     patientFile.close();
     remove("patients.txt");
     rename("temp.txt", "patients.txt");
+    patientFile.open("patients.txt");
     tempBills.close();
     in.close();
     remove("bills.txt");
@@ -574,6 +575,7 @@ void generateBill(ifstream &in) {
     tempTreatments.close();
     remove("treatments.txt");
     rename("temp2.txt", "treatments.txt");
+    treatmentFile.open("treatments.txt");
 }
 
 void searchPatientBydoc_ID() {
