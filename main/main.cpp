@@ -44,7 +44,7 @@ void deletePatient();
 void deleteDoctor();
 void viewPatients(ifstream &inFile);
 void viewDoctors(ifstream &inFile);
-void addTreatment(Treatment t1);
+void addTreatment();
 void viewTreatment(ifstream &treatmentFile);
 void updatePayment(ifstream &in);
 void generateBill(ifstream &in, ifstream &patientFile, ifstream &treatmentFile);
@@ -208,7 +208,7 @@ int main() {
                 cin.ignore();
                 switch(opt) {
                     case 1:
-                        addTreatment(t1);
+                        addTreatment();
                         break;
                     case 2:
                         viewTreatment(treatmentIn);
@@ -240,6 +240,7 @@ int main() {
                         cout<<endl<<"==========Search Patient=========="<<endl;
                         cout<<endl<<"1. Search by Patient ID ";
                         cout<<endl<<"2. Search by Patient Name";
+                        cout<<endl<<"3. Search Patient By Doc ID";
                         cout<<endl<<"Enter Your Choice: ";
                         cin>>o;
                         cin.ignore();
@@ -310,6 +311,9 @@ int main() {
                                 else if (found == false) {
                                     cout<<endl<<"Patient Not Found"<<endl;
                                 }
+                        }
+                        else if (o == 3) {
+                            searchPatientBydoc_ID();
                         }
                         else {
                                 cout<<endl<<"Invalid Option"<<endl;
@@ -393,8 +397,108 @@ int main() {
     return 0;
 }
 
-void addTreatment(Treatment t1) {
-    
+void addTreatment()
+{
+           
+
+    do
+    {
+        string line;
+        string result;
+        bool check = false;
+        Treatment p;
+        string x = "";
+        string bill;
+
+        cout << "Enter the patient Id" << endl;
+        cin >> p.patientId;
+        cin.ignore();
+
+        cout << "Enter the type of treatment" << endl;
+        getline(cin, p.description);
+
+        cout << "Enter the cost of treatment" << endl;
+        cin >> p.cost;
+
+        cout << "Have you paid your bill" << endl;
+        cin >> x;
+
+        if (x == "YES" || x == "Yes" || x == "yes")
+            p.paid = true;
+        else
+            p.paid = false;
+
+        bill = (p.paid == true) ? "true" : "false";
+
+        ifstream infile("patients.txt");
+        if (!infile)
+        {
+            cout << "Patient File cannot be opened" << endl;
+            goto ask;
+        }
+
+ 
+        while (getline(infile, line))
+        {
+            result = "";
+            int count = 0;
+
+            int len = line.size();            
+            char* arr = new char[len];          
+            for (int i = 0; i < len; i++)
+            {
+                arr[i] = line[i];              
+            }
+
+            for (int i = 0; i < len; i++)      
+            {
+                char c = arr[i];
+                if (c == '#')
+                {
+                    count++;
+                    continue;
+                }
+                if (count == 0)
+                {
+                    result += c;
+                }
+            }
+            delete[] arr;                      
+
+            if (result == to_string(p.patientId))
+            {
+                check = true;
+                break;
+            }
+        }
+        infile.close();
+
+        if (check == true)
+        {
+            ofstream outfile("treatments.txt", ios::app);
+            if (!outfile)
+            {
+                cout << "Treatment File cannot be opened" << endl;
+                goto ask;
+            }
+            outfile << p.patientId   << "#" << p.description << "#"
+                    << p.cost << "#" << bill << endl;
+            outfile.close();
+            cout << "Treatment added successfully!" << endl;
+        }
+        else
+        {
+            cout << "Patient Id is not found" << endl;
+        }
+
+    ask:
+        char choice;
+        cout << "\nDo you want to enter another patient? (y/n): ";
+        cin >> choice;
+        if (choice == 'n' || choice == 'N')
+            break;
+
+    } while (true);
 }
 
 void viewTreatment(ifstream &treatmentFile) {
@@ -578,8 +682,64 @@ void generateBill(ifstream &in, ifstream &patientFile, ifstream &treatmentFile) 
     treatmentFile.open("treatments.txt");
 }
 
-void searchPatientBydoc_ID() {
+void searchPatientBydoc_ID()
+{
+    cout<<"Enter Doctor ID: ";
+    int id;
+    cin>>id;
+    cin.ignore();
+    ifstream file("appointments.txt");
+    if (!file)
+    {
+        cout << "File cannot be opened" << endl;
+        return;
+    }
+    else
+    {
+        string line, result;
+        bool found = false;
 
+        while (getline(file, line))
+        {
+            result = "";
+            int count = 0;
+
+            int len = line.size();
+            char* arr = new char[len];
+            for (int i = 0; i < len; i++)
+            {
+                arr[i] = line[i];
+            }
+
+            for (int i = 0; i < len; i++)
+            {
+                char c = arr[i];
+                if (c == '#')
+                {
+                    count++;
+                    continue;
+                }
+                if (count == 1)
+                {
+                    result += c;
+                }
+            }
+            delete[] arr;
+
+            if (result ==to_string(id))
+            {
+                cout << line << endl;
+                found = true;
+            }
+        }
+
+        if (!found)
+        {
+            cout << "No patients found for Doctor ID: " << id << endl;
+        }
+    }
+
+    file.close();
 }
 
 void searchDoctorBySpecialty(ifstream &inFile) {
@@ -684,8 +844,100 @@ void sortDoctorsByExperience(ifstream &inFile) {
     newFile.close();
     inFile.open("doctors.txt");
 }
-void scheduleAppointment() {
 
+void scheduleAppointment()
+{
+    do
+    {
+        Appointment p;
+        cout << "Enter Patient ID: ";
+        cin>>p.patientId;
+        cin.ignore();
+        cout << "Enter Doctor ID: ";
+        cin >> p.doctorId;
+        cin.ignore();
+        cout << "Enter the date (Month-Date-Year): ";
+        cin.getline(p.date, 11);
+        cout << "Enter the time (24-hour format): ";
+        cin.getline(p.time, 10);
+
+        ifstream infile("doctors.txt");
+        if (!infile)
+        {
+            cout << "File cannot be opened\n";
+            goto ask;
+        }
+        else
+        {
+            string line;
+            string result;
+            bool doc = false;
+
+            while (getline(infile, line))
+            {
+                result = "";
+                int count = 0;
+
+                int len = line.size();
+                char* arr = new char[len];
+                for (int i = 0; i < len; i++)
+                {
+                    arr[i] = line[i];
+                }
+
+                for (int i = 0; i < len; i++)
+                {
+                    char c = arr[i];
+                    if (c == '#')
+                    {
+                        count++;
+                        continue;
+                    }
+                    if (count < 1)
+                    {
+                        result += c;
+                    }
+                }
+                delete[] arr;
+
+                if (result == to_string(p.doctorId))
+                {
+                    cout << "Doctor found\n";
+                    doc = true;
+                    break;
+                }
+            }
+            infile.close();
+
+            if (doc == true)
+            {
+                ofstream outfile("appointments.txt", ios::app);
+                if (!outfile)
+                {
+                    cout << "File cannot be opened\n";
+                    return;
+                }
+                outfile << p.patientId << "#"  << p.doctorId  << "#"
+                        << p.date << "#"<< p.time << endl;
+                outfile.close();
+            }
+            else
+            {
+                cout << "Cannot schedule appointment, doctor is invalid\n";
+            }
+        }
+
+    ask:
+        {
+            char choice;
+            cout << "\nDo you want to enter another appointment? (y/n): ";
+            cin >> choice;
+            cin.ignore();
+            if (choice == 'n' || choice == 'N')
+                break;
+        }
+
+    } while (true);
 }
 void cancelAppointment(ifstream &inFile) {
     inFile.clear();
@@ -714,11 +966,217 @@ void cancelAppointment(ifstream &inFile) {
     delete a1;
     inFile.open("appointments.txt");
 }
-void addPatient() {
+void addPatient()
+{
+    do
+    {
+        Patient p;
+        string result = "";
 
+        cout << "Enter Patient ID: ";
+        cin >> p.patientId;
+        cin.ignore();
+
+        cout << "Enter Name: ";
+        getline(cin, p.name);
+
+        cout << "Enter Age: ";
+        cin >> p.age;
+
+        cout << "Enter Gender (M/F): ";
+        cin >> p.gender;
+
+        if (p.gender == "M" || p.gender == "m")
+            p.gender = "Male";
+        else if (p.gender == "F" || p.gender == "f")
+            p.gender = "Female";
+        else
+            p.gender = "Not Recognized";
+
+        cout << "Enter Contact: ";
+        cin >> p.contact;
+
+        cout << "Enter the balance: ";
+        cin >> p.balance;
+        cin.ignore();
+
+        if (p.patientId == 0 || p.age == 0 || p.gender.empty() || p.name.empty() || p.contact.empty() )
+        {
+            cout << "Error: All fields are required!\n";
+            goto ask;
+        }
+
+        {
+            ifstream infile("patients.txt");
+            if (!infile)
+            {
+                cout << "Cannot open file.\n";
+            }
+            else
+            {
+                string line;
+                bool exists = false;
+
+                while (getline(infile, line))
+                {
+                    result = "";
+                    int count = 0;
+
+                    int len = line.size();
+                    char* arr = new char[len];
+                    for (int i = 0; i < len; i++)
+                    {
+                        arr[i] = line[i];
+                    }
+
+                    for (int i = 0; i < len; i++)
+                    {
+                        char c = arr[i];
+                        if (c == '#')
+                        {
+                            count++;
+                            continue;
+                        }
+                        if (count < 1)
+                        {
+                            result += c;
+                        }
+                    }
+                    delete[] arr;
+
+                    if (result == to_string(p.patientId))
+                    {
+                        cout << "\nThis ID already exists.\n";
+                        cout << "Data cannot be saved.\n";
+                        exists = true;
+                        break;
+                    }
+                }
+                infile.close();
+
+                if (exists)
+                {
+                    goto ask;
+                }
+            }
+        }
+
+        {
+            ofstream outfile("patients.txt", ios::app);
+            outfile << p.patientId  << "#"<< p.name << "#"<< p.age << "#"
+                    << p.gender << "#"<< p.contact << "#"<< p.balance << endl;
+            outfile.close();
+            cout << "Patient added successfully!\n";
+        }
+
+    ask:
+        {
+            char choice;
+            cout << "\nDo you want to enter another patient? (y/n): ";
+            cin >> choice;
+            if (choice == 'n' || choice == 'N')
+                break;
+        }
+
+    } while (true);
 }
-void addDoctor() {
+void addDoctor()
+{
+    do
+    {
+        Doctor p;
+        string result = "";
 
+        cout << "Enter Doctor ID: ";
+        cin >> p.doc_id;
+        cin.ignore();
+
+        cout << "Enter Name: ";
+        getline(cin, p.name);
+
+        cout << "Enter Speciality: ";
+        getline(cin, p.specialty);
+
+        cout << "Enter Experience: ";
+        cin >> p.experience;
+
+        if (p.doc_id == 0 || p.name.empty() || p.specialty.empty() || p.experience == 0)
+        {
+            cout << "Error: All fields are required!\n";
+            goto ask;
+        }
+        else
+        {
+            ifstream infile("doctors.txt");
+            if (!infile)
+            {
+                cout << "Cannot open file.\n";
+            }
+            else
+            {
+                string line;
+                bool exists = false;
+
+                while (getline(infile, line))
+                {
+                    result = "";
+                    int count = 0;
+
+                    int len = line.size();
+                    char* arr = new char[len];
+                    for (int i = 0; i < len; i++)
+                    {
+                        arr[i] = line[i];
+                    }
+
+                    for (int i = 0; i < len; i++)
+                    {
+                        char c = arr[i];
+                        if (c == '#')
+                        {
+                            count++;
+                            continue;
+                        }
+                        if (count < 1)
+                        {
+                            result += c;
+                        }
+                    }
+                    delete[] arr;
+
+                    if (result == to_string(p.doc_id))
+                    {
+                        cout << "\nThis ID already exists.\n";
+                        cout << "Data cannot be saved.\n";
+                        exists = true;
+                        break;
+                    }
+                }
+                infile.close();
+
+                if (!exists)
+                {
+                    ofstream outfile("doctors.txt", ios::app);
+                    outfile << p.doc_id  << "#"<< p.name  << "#"
+                            << p.specialty << "#"<< p.experience << endl;
+                    outfile.close();
+                    cout << "Doctor added successfully!\n";
+                }
+            }
+        }
+
+    ask:
+        {
+            char choice;
+            cout << "\nDo you want to enter another Doctor? (y/n): ";
+            cin >> choice;
+            if (choice == 'n' || choice == 'N')
+            {
+                break;
+            }
+        }
+
+    } while (true);
 }
 void updatePatient(ifstream &inFile) {
     inFile.clear();
@@ -865,12 +1323,154 @@ void updateDoctor(ifstream &inFile) {
     delete d1;
     inFile.open("doctors.txt");
 }
-void deletePatient() {
+void deletePatient()
+{
+    char choice;
+    do
+    {
+        string id;
+        cout << "Enter Patient ID you want to delete: ";
+        cin >> id;
 
-}
-void deleteDoctor() {
+        ifstream infile("patients.txt");
+        if (!infile)
+        {
+            cout << "Cannot open file.\n";
+        }
+        else
+        {
+            ofstream tempfile("temp.txt");
+            string line;
+            bool found = false;
 
+            while (getline(infile, line))
+            {
+                string result = "";
+                int len = line.size();
+
+                char* arr = new char[len];
+
+                for (int i = 0; i < len; i++)
+                {
+                    arr[i] = line[i];
+                }
+
+                for (int i = 0; i < len; i++)
+                {
+                    if (arr[i] == '#')
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        result += arr[i];
+                    }
+                }
+
+                delete[] arr;
+
+                if (result == id)
+                {
+                    found = true;
+                    cout << "Patient found and deleted.\n";
+                }
+                else
+                {
+                    tempfile << line << "\n";
+                }
+            }
+
+            infile.close();
+            tempfile.close();
+
+            remove("patients.txt");
+            rename("temp.txt", "patients.txt");
+
+            if (!found)
+                cout << "ID not found!\n";
+        }
+
+        cout << "\nDo you want to delete another patient? (y/n): ";
+        cin >> choice;
+
+    } while (choice == 'y' || choice == 'Y');
 }
+
+void deleteDoctor()
+{
+    char choice;
+
+    do
+    {
+        string id;
+        cout << "Enter Doctor ID you want to delete: ";
+        cin >> id;
+
+        ifstream infile("doctors.txt");
+        if (!infile)
+        {
+            cout << "Cannot open file.\n";
+        }
+        else
+        {
+            ofstream tempfile("temp.txt");
+            string line;
+            bool found = false;
+
+            while (getline(infile, line))
+            {
+                string result = "";
+                int len = line.size();
+
+                char* arr = new char[len];   
+
+                for (int i = 0; i < len; i++)
+                {
+                    arr[i] = line[i];         
+                }
+
+                for (int i = 0; i < len; i++)
+                {
+                    if (arr[i] == '#')
+                    {
+                        break;
+				}
+				else
+				{               
+                    result += arr[i];   
+                }
+            }
+
+                delete[] arr;                
+               
+
+                if (result == id)
+                {
+                    found = true;
+                    cout << "Doctor found and deleted.\n";
+                }
+                else
+                {
+                    tempfile << line << "\n";
+                }
+            }
+
+            infile.close();
+            tempfile.close();
+
+            remove("doctors.txt");
+            rename("temp.txt", "doctors.txt");
+
+            if (!found)
+                cout << "ID not found!\n";
+        }
+
+        cout << "\nDo you want to delete another doctor? (y/n): ";
+        cin >> choice;
+
+    } while (choice == 'y' || choice == 'Y');
+}
+
 void viewPatients(ifstream &inFile) {
     inFile.clear();
     inFile.seekg(0, ios::beg);
@@ -908,8 +1508,84 @@ void viewDoctors(ifstream &inFile) {
     }
     delete d1;
 }
-void viewAppointments() {
-    
+void viewAppointments()
+{
+    do
+    {
+        ifstream file("appointments.txt");
+        if (!file)
+        {
+            cout << "File cannot be opened" << endl;
+            goto ask;
+        }
+        else
+        {
+            string line, patientid, doctorid, date, time;
+
+            while (getline(file, patientid, '#') && getline(file, doctorid, '#')
+                && getline(file, date, '#') && getline(file, time))
+            {
+                cout << patientid << " - " << doctorid << " - " << date << " - " << time << endl;
+                cout << "------------------------" << endl;
+            }
+
+            file.clear();
+            file.seekg(0);
+
+            int id;
+            string line1, result;
+            cout << "Enter an id of doctor to check its appointment: ";
+            cin >> id;
+
+            while (getline(file, line1))
+            {
+                result = "";
+                int count = 0;
+
+                int len = line1.size();
+                char* arr = new char[len];
+                for (int i = 0; i < len; i++)
+                {
+                    arr[i] = line1[i];
+                }
+
+                for (int i = 0; i < len; i++)
+                {
+                    char c = arr[i];
+                    if (c == '#')
+                    {
+                        count++;
+                        continue;
+                    }
+                    if (count == 1)
+                    {
+                        result += c;
+                    }
+                    if (count > 1)
+                    {
+                        break;
+                    }
+                }
+                delete[] arr;
+
+                if (result == to_string(id))
+                {
+                    cout << line1 << endl;
+                }
+            }
+            file.close();
+        }
+
+    ask:
+        {
+            char choice;
+            cout << "\nDo you want to enter another record? (y/n): ";
+            cin >> choice;
+            if (choice == 'n' || choice == 'N')
+                break;
+        }
+
+    } while (true);
 }
 void cleanFile() {
     ifstream patientFile("patients.txt"); 
