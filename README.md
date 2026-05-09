@@ -3,7 +3,7 @@
 
 ![Language](https://img.shields.io/badge/Language-C%2B%2B-blue)
 ![Storage](https://img.shields.io/badge/Storage-File--Based-lightgrey)
-![Status](https://img.shields.io/badge/Status-In%20Development-yellow)
+![Status](https://img.shields.io/badge/Status-Completed-green)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---

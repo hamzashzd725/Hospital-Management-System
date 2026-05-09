@@ -70,15 +70,25 @@ int main() {
     Doctor d1;
     cleanFile();
     ifstream treatmentIn("treatments.txt");
-    
+    if (treatmentIn.fail()) {
+        cout<<endl<<"Failed to Open Treatment File"<<endl;
+    }    
     ifstream billIn("bills.txt");
-
+    if (billIn.fail()) {
+        cout<<endl<<"Failed to Open Bill File"<<endl;
+    }
     ifstream patientIn("patients.txt");
-    
+    if (patientIn.fail()) {
+        cout<<endl<<"Failed to Open Patient File"<<endl;
+    }
     ifstream doctorIn("doctors.txt");
-    
+    if (doctorIn.fail()) {
+        cout<<endl<<"Failed to Open Doctor File"<<endl;
+    }
     ifstream appointmentIn("appointments.txt");
-
+    if (appointmentIn.fail()) {
+        cout<<endl<<"Failed to Open Appointment File"<<endl;
+    }
     cout<<"Enter User ID: ";
     cin>>id;
     cout<<"==========Welcome User "<<id<<"==========\nEnter Password: ";
@@ -1596,15 +1606,79 @@ void cleanFile() {
     cleanTreatment(treatmentFile);
     cleanDoctor(doctorFile);
     cleanAppointment(appointmentFile);
-    patientFile.close();
-    treatmentFile.close();
-    doctorFile.close();
-    appointmentFile.close();
+    removeDuplicatePatients();
 }
 void removeDuplicatePatients() {
+    ifstream inFile("patients.txt");
+    if (!inFile) {
+        cout<<"Cannot open patients file."<<endl;
+        return;
+    }
 
+    
+    Patient *p1 = new Patient;
+    int seenIds[1000];
+    int seenCount = 0;
+
+    while (inFile >> p1->patientId) {
+        inFile.ignore();
+        getline(inFile, p1->name, '#');
+        inFile>>p1->age;
+        inFile.ignore();
+        getline(inFile, p1->gender, '#');
+        getline(inFile, p1->contact, '#');
+        inFile >> p1->balance;
+        inFile.ignore();
+
+        bool alreadySeen = false;
+        for (int i = 0; i < seenCount; i++) {
+            if (seenIds[i] == p1->patientId) {
+                alreadySeen = true;
+                break;
+            }
+        }
+        if (!alreadySeen) {
+            seenIds[seenCount++] = p1->patientId;
+        }
+    }
+
+    inFile.clear();
+    inFile.seekg(0, ios::beg);
+
+    ofstream outFile("temp_dedup.txt");
+    bool written[1000] = {false};
+
+    while (inFile >> p1->patientId) {
+        inFile.ignore();
+        getline(inFile, p1->name, '#');
+        inFile >> p1->age;
+        inFile.ignore();
+        getline(inFile, p1->gender, '#');
+        getline(inFile, p1->contact, '#');
+        inFile >> p1->balance;
+        inFile.ignore();
+
+        int idx = -1;
+        for (int i = 0; i < seenCount; i++) {
+            if (seenIds[i] == p1->patientId) {
+                idx = i;
+                break;
+            }
+        }
+
+        if (idx != -1 && !written[idx]) {
+            outFile<<p1->patientId<<"#"<<p1->name<<"#"<<p1->age<<"#"<<p1->gender<<"#"<<p1->contact << "#" << p1->balance << endl;
+            written[idx] = true;
+        }
+    }
+
+    inFile.close();
+    outFile.close();
+    delete p1;
+
+    remove("patients.txt");
+    rename("temp_dedup.txt", "patients.txt");
 }
-
 void cleanDoctor(ifstream &inFile) {
     ofstream out("temp.txt");
     string line;
@@ -1618,9 +1692,10 @@ void cleanDoctor(ifstream &inFile) {
         }
         out<<line<<endl;
     }
+    out.close();
+    inFile.close();
     remove("doctors.txt");
     rename("temp.txt", "doctors.txt");
-    out.close();
 
 }
 void cleanPatient(ifstream &inFile) {
@@ -1673,9 +1748,11 @@ void cleanPatient(ifstream &inFile) {
             outFile<<p1->patientId<<"#"<<p1->name<<"#"<<p1->age<<"#"<<p1->gender<<"#"<<p1->contact<<"#"<<p1->balance<<endl;
         }
     }
+    outFile.close();
+    inFile.close();
     remove("patients.txt");
     rename("temp.txt", "patients.txt");
-    outFile.close();
+    
     delete p1;
 }
 void cleanAppointment(ifstream &inFile) {
@@ -1774,9 +1851,10 @@ void cleanAppointment(ifstream &inFile) {
                <<"#"<<convertedTime<<endl;
         }
     }
+    out.close();
+    inFile.close();
     remove("appointments.txt");
     rename("temp.txt", "appointments.txt");
-    out.close();
     delete a1;
 }
 void cleanTreatment(ifstream &inFile) {
@@ -1792,9 +1870,11 @@ void cleanTreatment(ifstream &inFile) {
         }
         out<<line<<endl;
     }
+    out.close();
+    inFile.close();
     remove("treatments.txt");
     rename("temp.txt", "treatments.txt");
-    out.close();
+    
 }
 bool isValidRecord(int count, string line) {
     int hash = 0;
